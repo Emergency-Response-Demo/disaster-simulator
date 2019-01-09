@@ -3,7 +3,7 @@ while true; do
     echo
     echo
     echo Things are bad. People need help.
-    psql -U ${POSTGRES_USER} -h postgresql.naps-emergency-response.svc -d ${POSTGRES_DATABASE} --command="update mission set current_status='Assigned' where mission_id in (select mission_id from mission where current_status='Requested' order by last_update desc limit 1);"
+    psql -U ${POSTGRESQL_USER} -h postgresql.naps-emergency-response.svc -d ${POSTGRESQL_DATABASE} --command="update mission set current_status='Assigned' where mission_id in (select mission_id from mission where current_status='Requested' order by last_update desc limit 1);"
 
 #update mission set current_status='Pickedup' where mission_id in (select mission_id from mission where current_status='Assigned' order by last_update desc limit 20);
 #update mission set current_status='Rescued' where mission_id in (select mission_id from mission where current_status='Pickedup' order by last_update desc limit 20);
