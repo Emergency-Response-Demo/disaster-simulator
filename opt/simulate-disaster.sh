@@ -1,3 +1,8 @@
+# NOTE: Set these variables before running this script
+#   POSTGRESQL_USER
+#   POSTGRESQL_HOSTNAME
+#   POSTGRESQL_DATABASE
+
 DELAY=5
 
 function sql() {
