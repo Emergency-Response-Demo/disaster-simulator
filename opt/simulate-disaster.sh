@@ -2,7 +2,7 @@ DELAY=5
 
 function sql() {
     sql=$1
-    psql -U ${POSTGRESQL_USER} -h postgresql.naps-emergency-response.svc -d ${POSTGRESQL_DATABASE} --command="${sql}"
+    psql -U ${POSTGRESQL_USER} -h ${POSTGRESQL_HOSTNAME} -d ${POSTGRESQL_DATABASE} --command="${sql}"
 }
 
 function change_status() {
