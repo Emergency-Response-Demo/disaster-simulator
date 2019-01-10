@@ -30,26 +30,26 @@ echo "Simulation starting"
 echo "Setting status of all Missions to 'Requested'"
 sql "update mission set current_status='Requested';"
 
-change_status("Requested", "Assigned", 20)
-change_status("Requested", "Pickedup", 20)
-change_status("Requested", "Rescued", 20)
-change_status("Requested", "Cancelled", 20)
+change_status "Requested"  "Assigned"  20
+change_status "Requested"  "Pickedup"  20
+change_status "Requested"  "Rescued"  20
+change_status "Requested"  "Cancelled"  20
 
 while true; do
 
     echo
-    change_status("Requested", "Assigned", 20)
-    delay()
-    change_status("Assigned", "Pickedup", 15)
-    delay()
-    change_status("Assigned", "Cancelled", 5)
-    delay()
-    change_status("Pickedup", "Rescued", 15)
-    delay()
-    change_status("Rescued", "Requested", 15)
-    delay()
-    change_status("Cancelled", "Requested", 5)
-    delay()
+    change_status "Requested"  "Assigned"  20 
+    delay  
+    change_status "Assigned"  "Pickedup"  15 
+    delay  
+    change_status "Assigned"  "Cancelled"  5 
+    delay  
+    change_status "Pickedup"  "Rescued"  15 
+    delay  
+    change_status "Rescued"  "Requested"  15 
+    delay  
+    change_status "Cancelled"  "Requested"  5 
+    delay  
     
 
 done
