@@ -15,6 +15,7 @@ function change_status() {
     to_status=$2
     count=$3
 
+    echo "${from_status} -> ${to_status} (${count})"
     sql "update mission set current_status='${to_status}' where mission_id in (select mission_id from mission where current_status='${from_status}' limit ${count});"
 
 }
