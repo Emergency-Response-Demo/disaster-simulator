@@ -29,6 +29,23 @@ function delay() {
     sleep ${DELAY}
 }
 
+GLOBAL_RANDOM=1
+function update_global_random() {
+    low=$1
+    high=$2
+
+    let "GLOBAL_RANDOM = $RANDOM % ($high + 1) + $low"
+}
+
+# Apply the specified status transition to several incedents, with the count and specific incidents chosen randomly
+change_status_randomly() {
+    from_status=$1
+    to_status=$2
+
+    update_global_random 0 2
+    change_status "Requested"  "Assigned"  ${GLOBAL_RANDOM}
+}
+
 
 echo "Simulator starting"
 
@@ -37,12 +54,13 @@ while true; do
     reset_simulation
 
     i="0"
-    while [ $i -lt 160 ]; do
-        change_status "Requested"  "Assigned"  1
+    while [ $i -lt 180 ]; do
+
+        change_status_randomly "Requested" "Assigned"
         delay
-        change_status "Assigned"  "Pickedup"  1
+        change_status_randomly "Assigned" "Pickedup"
         delay
-        change_status "Pickedup"  "Rescued"  1
+        change_status_randomly "Pickedup" "Rescued"
         delay
         echo
         i=$[i+1]
