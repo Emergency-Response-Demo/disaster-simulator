@@ -39,10 +39,12 @@ while true; do
     i="0"
     while [ $i -lt 160 ]; do
         change_status "Requested"  "Assigned"  1
-        change_status "Assigned"  "Pickedup"  1
-        change_status "Pickedup"  "Rescued"  1
-        echo
         delay
+        change_status "Assigned"  "Pickedup"  1
+        delay
+        change_status "Pickedup"  "Rescued"  1
+        delay
+        echo
         i=$[i+1]
     done
 
