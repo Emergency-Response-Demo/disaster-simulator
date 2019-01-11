@@ -7,7 +7,7 @@ DELAY=1
 
 function sql() {
     sql=$1
-    echo psql -U ${POSTGRESQL_USER} -h ${POSTGRESQL_HOSTNAME} -d ${POSTGRESQL_DATABASE} --command="${sql}"
+    psql -U ${POSTGRESQL_USER} -h ${POSTGRESQL_HOSTNAME} -d ${POSTGRESQL_DATABASE} --command="${sql}"
 }
 
 function change_status() {
