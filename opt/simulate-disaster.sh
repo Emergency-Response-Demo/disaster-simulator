@@ -41,9 +41,10 @@ function update_global_random() {
 change_status_randomly() {
     from_status=$1
     to_status=$2
+    max_count=$3
 
-    update_global_random 0 2
-    change_status "Requested"  "Assigned"  ${GLOBAL_RANDOM}
+    update_global_random 0 ${max_count}
+    change_status ${from_status} ${to_status}  ${GLOBAL_RANDOM}
 }
 
 
@@ -56,11 +57,11 @@ while true; do
     i="0"
     while [ $i -lt 180 ]; do
 
-        change_status_randomly "Requested" "Assigned"
+        change_status_randomly "Requested" "Assigned" 3
         delay
-        change_status_randomly "Assigned" "Pickedup"
+        change_status_randomly "Assigned" "Pickedup" 2
         delay
-        change_status_randomly "Pickedup" "Rescued"
+        change_status_randomly "Pickedup" "Rescued" 2
         delay
         echo
         i=$[i+1]
