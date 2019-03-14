@@ -1,4 +1,0 @@
-52.112507	-8.95761	cross5	red	1	This is a fairly large cross on the map.
-52.219071	-8.65764	plus3	green	3	Legend linked to green plus.
-52.35235	-8.95573	diamond3	yellow	2	Difference between diamond and square is 45 degrees.
-52.01221	-8.54834	circle4	blue	4	And all shapes except dot have a black border. Do not like the black border around the circle? Go for the dot.
