@@ -77,7 +77,6 @@ public class GeneratePhoneNumbers {
 				"202"));
 	}
 				
-				
 	private void initNCAreaCodes()
 	{
 		ncAreaCodesList.addAll(Arrays.asList(
