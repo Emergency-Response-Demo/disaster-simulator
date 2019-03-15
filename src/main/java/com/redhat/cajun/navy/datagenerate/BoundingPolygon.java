@@ -7,7 +7,13 @@ public class BoundingPolygon extends java.awt.geom.Path2D.Double {
 	//Note that lat are Ys and longs are Xs, ie you probably have to transpose 
 	//the order that is given in google maps
 	
-	//Wilmington, NC bounding box with just a touch in the water.
+	/*
+	 * Wilmington, NC bounding box with just a touch in the water.
+	 * Please note if you want to add another coordinate system, 
+	 * lets please externalize these points to a configuration file 
+	 * and make other changes in the code base
+	 */
+	
 	private java.awt.geom.Point2D.Double points[] = {
 			new java.awt.geom.Point2D.Double(-77.95, 34.26),
 			new java.awt.geom.Point2D.Double(-77.82, 34.26),
@@ -21,18 +27,19 @@ public class BoundingPolygon extends java.awt.geom.Path2D.Double {
 			new java.awt.geom.Point2D.Double(-77.96, 34.20)
 	};
 			
-	public void setPoints(java.awt.geom.Point2D.Double[] points) {
-		this.points = points;
-	}
-
-	BoundingPolygon()
+		BoundingPolygon()
 	{
 		init();
 	}
 	
+	/*
+	 * I need to be called any time I want to reload the bounding polygon 
+	 */
 	public void init()
 	{
+		//Clear the bounding polygon when using another coordinate system
 		reset();
+		
 		if(points.length <= 2)
 		{
 			throw new RuntimeException("You must set at least 3 points that are not in a line to make an enclosed area");
@@ -50,6 +57,7 @@ public class BoundingPolygon extends java.awt.geom.Path2D.Double {
 		closePath();
 	}
 	
+	//Creates a bounding box of an X
 	public void setxcross()
 	{
 		points = new java.awt.geom.Point2D.Double[]{
@@ -61,6 +69,7 @@ public class BoundingPolygon extends java.awt.geom.Path2D.Double {
 		init();
 	}
 	
+	//Creates a bounding box of a square.
 	public void setsquare()
 	{
 		points = new java.awt.geom.Point2D.Double[]{
@@ -72,6 +81,7 @@ public class BoundingPolygon extends java.awt.geom.Path2D.Double {
 		init();
 	}
 	
+	//Creates a bounding box of 2 points to ensure an exception is thrown if you do that.
 	public void setTwoPoints()
 	{
 		points = new java.awt.geom.Point2D.Double[]{
@@ -81,6 +91,7 @@ public class BoundingPolygon extends java.awt.geom.Path2D.Double {
 		init();
 	}
 	
+	//Try to create a bounding box of 3 points in a line, which is not a triangle, and has no area.
 	public void setThreePointsLine()
 	{
 		points = new java.awt.geom.Point2D.Double[]{
@@ -91,6 +102,7 @@ public class BoundingPolygon extends java.awt.geom.Path2D.Double {
 		init();
 	}
 	
+	//Valuidate that a trianlge works for the data.
 	public void setThreePointsArea()
 	{
 		points = new java.awt.geom.Point2D.Double[]{
@@ -101,6 +113,10 @@ public class BoundingPolygon extends java.awt.geom.Path2D.Double {
 		init();
 	}
 	
+	/*
+	 * Simple toString method that returns the values for pasting into:
+	 * http://www.copypastemap.com/map.php
+	 */
 	public String toString()
 	{
         StringBuilder stringBuilder = new StringBuilder();
@@ -128,9 +144,19 @@ public class BoundingPolygon extends java.awt.geom.Path2D.Double {
 		return stringBuilder.toString();
 	}
 	
+	//Helper method to create specific points
+	public void setPoints(java.awt.geom.Point2D.Double[] points) {
+		this.points = points;
+		
+		init();
+	}
+	
 	public static void main(String args[])
 	{
 		BoundingPolygon boundingPolygon = new BoundingPolygon();
+		
+		//Methods to make it easy to see the varioius bounding boxes that can be cut and pasted into
+		//http://www.copypastemap.com/map.php
 		//boundingPolygon.setThreePointsArea();
 		//boundingPolygon.setThreePointsLine();
 		//boundingPolygon.setxcross();
