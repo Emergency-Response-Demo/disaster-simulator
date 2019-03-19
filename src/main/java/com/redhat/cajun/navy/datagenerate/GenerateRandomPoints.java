@@ -8,6 +8,7 @@ import java.awt.geom.Point2D.Double;
  * Please note that x and y, which we are all pretty comfortable with in Latitude and Longitude is reversed.
  * Longitude is an x and Latitude is a y to just be confusing.
  * This simple class uses the BoundingPolygon and then finds points that are within the bounding polygon.
+ * 
  */
 
 public class GenerateRandomPoints {
@@ -31,6 +32,9 @@ public class GenerateRandomPoints {
 		//boundingPolygon.setThreePointsLine();
 		//boundingPolygon.setxcross();
 		//boundingPolygon.setsquare();
+		//boundingPolygon.setsTwoSquares();
+		//boundingPolygon.setReverseSquare();
+		//boundingPolygon.setsTwoSquaresWithOneInternalSquare();
 		
 		//Debug statement so you can cut and paste the generated points into the copypastemap.com url noted above.
 		//System.err.println(boundingPolygon);
