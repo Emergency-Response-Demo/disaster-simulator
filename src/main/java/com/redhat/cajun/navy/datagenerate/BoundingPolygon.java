@@ -19,7 +19,6 @@ public class BoundingPolygon extends java.awt.geom.Path2D.Double {
 	 */
 	
 	private java.awt.geom.Point2D.Double points[] = {
-			
 			new java.awt.geom.Point2D.Double(-77.95, 34.26),
 			new java.awt.geom.Point2D.Double(-77.82, 34.26),
 			new java.awt.geom.Point2D.Double(-77.77, 34.24),

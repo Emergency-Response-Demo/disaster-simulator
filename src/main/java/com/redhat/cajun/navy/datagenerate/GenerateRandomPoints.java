@@ -100,8 +100,7 @@ public class GenerateRandomPoints {
 		while(running)
 		{
 			Double point = getInternalPoint();
-			
-		    stringBuilder.append(point.getY());
+			stringBuilder.append(point.getY());
 		    stringBuilder.append("\t");
 		    stringBuilder.append(point.getX());
 		    stringBuilder.append("\t");
