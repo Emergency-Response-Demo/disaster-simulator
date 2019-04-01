@@ -13,37 +13,13 @@ import java.awt.geom.Point2D.Double;
 
 public class GenerateRandomPoints {
 	
-	//This is marked as protected so extends of this call could easily update the bounding box points 
+	//This is marked as protected so extends of this call could easily update the bounding box points
 	//from within this class or a class that extends this class
 	//Leaving this here could in some cases in threading could create some bad behaviors.
 	//For the purposes of the demo it probably doesn't matter.
 	protected BoundingPolygon boundingPolygon = new BoundingPolygon();
-	private int maxNumberOfPointsToReturn = 500;
-	/*
-	 * You can view the generated points on a map here
-	 * http://www.copypastemap.com/map.php
-	 */
-	
-	GenerateRandomPoints()
-	{
-		//A bunch of boxes to ensure the APIs work well.
-		//Commented them in one at a time.  Last one wins if they are all uncommented
-		//boundingPolygon.setThreePointsArea();
-		//boundingPolygon.setThreePointsLine();
-		//boundingPolygon.setxcross();
-		//boundingPolygon.setsquare();
-		//boundingPolygon.setsTwoSquares();
-		//boundingPolygon.setReverseSquare();
-		//boundingPolygon.setsTwoSquaresWithOneInternalSquare();
-		
-		//Debug statement so you can cut and paste the generated points into the copypastemap.com url noted above.
-		//System.err.println(boundingPolygon);
-	}
 
-	/*
-	 * I return a point that is the bounding rectangle of the min/max of x and y.
-	 * It needs to be checked against the boundingPolygon to ensure it fits
-	 */
+
 	private Double getPoint()
 	{
 		Rectangle2D boundingRectangle = boundingPolygon.getBounds2D();
@@ -86,60 +62,5 @@ public class GenerateRandomPoints {
 		}
 		return null;
 	}
-	
-	/*
-	 * Simple toString method that returns the values for pasting into:
-	 * http://www.copypastemap.com/map.php
-	 */
-	public String toString()
-	{
-		StringBuilder stringBuilder = new StringBuilder();
-		int countPointsFound = 0;
-		boolean running = true;
-		
-		while(running)
-		{
-			Double point = getInternalPoint();
-			stringBuilder.append(point.getY());
-		    stringBuilder.append("\t");
-		    stringBuilder.append(point.getX());
-		    stringBuilder.append("\t");
-		    stringBuilder.append("circle1");
-		    stringBuilder.append("\t");
-		    stringBuilder.append("red");
-		    stringBuilder.append("\t");
-		    stringBuilder.append(countPointsFound+1);
-		    stringBuilder.append("\t");
-		    stringBuilder.append(countPointsFound+1);
-		    stringBuilder.append(System.lineSeparator());
-            countPointsFound++;
-            
-            if(countPointsFound >= maxNumberOfPointsToReturn)
-            {
-            	running = false;
-            }
-		}
-		
-		return stringBuilder.toString();
-	}
-	
-	public int getMaxNumberOfPointsToReturn() {
-		return this.maxNumberOfPointsToReturn;
-	}
 
-	public void setMaxNumberOfPoints(int maxNumberOfPointsToReturn) {
-		this.maxNumberOfPointsToReturn = maxNumberOfPointsToReturn;
-	}
-
-	public static void main(String[] args) {
-		//System.err.println("Starting generation");
-		
-		GenerateRandomPoints generateRandomPoints = new GenerateRandomPoints();
-		
-		//System.err.println(generateRandomPoints.getInternalPoint());
-		
-		generateRandomPoints.setMaxNumberOfPoints(1000);
-		
-		System.err.println(generateRandomPoints);
-	}
 }
