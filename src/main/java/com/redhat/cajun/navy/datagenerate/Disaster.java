@@ -20,8 +20,6 @@ public class Disaster {
 
         v.setVictimPhoneNumber(GeneratePhoneNumbers.getNextPhoneNumber());
         v.setNumberOfPeople(new Random().nextInt(10));
-        v.setStatus("REQUESTED");
-        v.setTimestamp(System.currentTimeMillis()+"");
 
         return v;
     }

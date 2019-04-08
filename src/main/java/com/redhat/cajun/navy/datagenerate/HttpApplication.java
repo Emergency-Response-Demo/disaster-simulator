@@ -1,9 +1,7 @@
 package com.redhat.cajun.navy.datagenerate;
 
 import io.vertx.core.AbstractVerticle;
-import io.vertx.core.Context;
 import io.vertx.core.Future;
-import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
@@ -48,18 +46,9 @@ public class HttpApplication extends AbstractVerticle {
 
         try {
             int n = Integer.parseInt(name);
-            Observable.from(disaster.generateVictims(n)).subscribe(System.out::println);
-
-            DeliveryOptions options = new DeliveryOptions().addHeader("action","send-incident");
-            vertx.eventBus().send("incident-queue", "{\"id\":\"d6dd9dbf-f902-4a83-b90c-4463e8b9998a\",\"lat\":-77.90569874596613,\"lon\":34.05371494700646,\"numberOfPeople\":6,\"victimName\":\"Nicholas Ella\",\"victimPhoneNumber\":\"(720) 555-1183\",\"status\":\"REQUESTED\",\"timestamp\":\"1554145306430\",\"medicalNeeded\":false}", options, reply -> {
-                if (reply.succeeded()) {
-                    System.out.println("Message accepted");
-                } else {
-                    System.out.println("Message not accepted");
-                }
-            });
-
-
+            Observable<Victim> ob = Observable.from(disaster.generateVictims(n));
+            ob.subscribe(item -> sendMessage(item), error -> error.printStackTrace(),
+                    () -> System.out.println("Done"));
 
 
         }catch(NumberFormatException nfe){
@@ -73,4 +62,17 @@ public class HttpApplication extends AbstractVerticle {
                 .putHeader(CONTENT_TYPE, "application/json; charset=utf-8")
                 .end(response.encodePrettily());
     }
+
+    public void sendMessage(Victim victim) {
+        DeliveryOptions options = new DeliveryOptions().addHeader("action", "send-incident");
+        vertx.eventBus().send("incident-queue", victim.toString(), options, reply -> {
+            if (reply.succeeded()) {
+                System.out.println("Message accepted");
+            } else {
+                System.out.println("Message not accepted");
+            }
+        });
+
+    }
+
 }

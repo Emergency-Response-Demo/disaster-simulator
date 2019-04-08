@@ -10,7 +10,7 @@
   <properties>
     <vertx.version>3.6.3.redhat-00009</vertx.version>
     <vertx-maven-plugin.version>1.0.18</vertx-maven-plugin.version>
-    <vertx.verticle>com.redhat.cajun.navy.datagenerate.HttpApplication</vertx.verticle>
+    <vertx.verticle>com.redhat.cajun.navy.datagenerate.Main</vertx.verticle>
     <fabric8-maven-plugin.version>3.5.42</fabric8-maven-plugin.version>
     <arquillian-cube.version>1.18.2</arquillian-cube.version>
     <maven.compiler.source>1.8</maven.compiler.source>
@@ -83,6 +83,15 @@
       <groupId>io.vertx</groupId>
       <artifactId>vertx-web</artifactId>
     </dependency>
+
+
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-web-client</artifactId>
+      <version>3.7.0</version>
+    </dependency>
+
+
     <!-- Testing -->
     <dependency>
       <groupId>io.vertx</groupId>
