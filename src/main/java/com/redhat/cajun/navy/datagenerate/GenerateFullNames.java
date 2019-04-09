@@ -20,8 +20,8 @@ public class GenerateFullNames {
         lNames = Collections.unmodifiableMap(getMapFromFile(lNameFile));
     }
 
-    public Map getMapFromFile(String fileName) {
-        Map<Integer, String> temp = new HashMap<Integer, String>();
+    public Map<Integer, String> getMapFromFile(String fileName) {
+        Map<Integer, String> temp = new HashMap<>();
         int count = 1;
         try {
             try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
