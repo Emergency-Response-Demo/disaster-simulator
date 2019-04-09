@@ -43,7 +43,6 @@ public class MainVerticle extends AbstractVerticle {
                     .setType("file")
                     .setFormat("properties")
                     .setConfig(new JsonObject().put("path", "local-app-config.properties"));
-            System.out.println(config());
             options.addStore(props);
         }
 

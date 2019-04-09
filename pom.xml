@@ -8,9 +8,9 @@
   <name>Vert.x - HTTP</name>
   <description>Exposes an HTTP API using Vert.x</description>
   <properties>
-    <vertx.version>3.6.3.redhat-00009</vertx.version>
+    <vertx.version>3.7.0</vertx.version>
     <vertx-maven-plugin.version>1.0.18</vertx-maven-plugin.version>
-    <vertx.verticle>com.redhat.cajun.navy.datagenerate.Main</vertx.verticle>
+    <vertx.verticle>com.redhat.cajun.navy.datagenerate.MainVerticle</vertx.verticle>
     <fabric8-maven-plugin.version>3.5.42</fabric8-maven-plugin.version>
     <arquillian-cube.version>1.18.2</arquillian-cube.version>
     <maven.compiler.source>1.8</maven.compiler.source>
@@ -36,11 +36,9 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
+
   <dependencies>
-
-
-
-    <dependency>
+  <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-rx-java2</artifactId>
     </dependency>
@@ -93,11 +91,7 @@
 
 
     <!-- Testing -->
-    <dependency>
-      <groupId>io.vertx</groupId>
-      <artifactId>vertx-web-client</artifactId>
-      <scope>test</scope>
-    </dependency>
+
     <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-unit</artifactId>
@@ -196,7 +190,6 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
-            <version>2.22.1</version>
             <configuration>
               <systemPropertyVariables>
                 <app.name>${project.artifactId}</app.name>

@@ -42,7 +42,7 @@ public class Main {
                 break;
             case "cli":
                 System.out.println("Generating Victims List in Json");
-                System.out.println(new Disaster().generateVictims(number));
+                System.out.println(new Disaster("","").generateVictims(number));
                 break;
             default: System.err.println("Incorrect mode");
         }

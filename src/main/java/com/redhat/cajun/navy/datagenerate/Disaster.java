@@ -7,8 +7,14 @@ import java.util.Random;
 
 public class Disaster {
 
-    private static GenerateFullNames fullNames = new GenerateFullNames("/opt/github.com/NAPS/disaster-simulator/src/main/resources/FNames.txt", "/opt/github.com/NAPS/disaster-simulator/src/main/resources/LNames.txt");
-    private static GenerateRandomPoints points = new GenerateRandomPoints();
+    private static GenerateFullNames fullNames = null;
+    private static GenerateRandomPoints points = null;
+
+
+    public Disaster(String fNameFile, String lNameFile){
+            fullNames = new GenerateFullNames(fNameFile,lNameFile);
+            points = new GenerateRandomPoints();
+    }
 
 
     public Victim generateVictim(){
