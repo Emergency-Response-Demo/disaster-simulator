@@ -319,9 +319,9 @@ data:
 
     lnames.file=/deployments/config/LNames.txt
 
-    incident.service=http://incident-service-naps-emergency-response.apps.753d.openshift.opentlc.com
+    incident.service=incident-service-naps-emergency-response.apps.753d.openshift.opentlc.com
 
-    incident.uri=/incident
+    incident.uri=/incidents
 
     enabled=false
 kind: ConfigMap

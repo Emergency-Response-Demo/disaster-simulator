@@ -1,18 +1,18 @@
 package com.redhat.cajun.navy.datagenerate;
 
 import io.vertx.core.AbstractVerticle;
-import io.vertx.core.Context;
 import io.vertx.core.Future;
-import io.vertx.core.Vertx;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.web.client.HttpResponse;
 import io.vertx.ext.web.client.WebClient;
 
 
 public class SendIncident extends AbstractVerticle {
 
-    String uri = "/incident";
+    String uri = "/incidents";
     String host = "incident-service-naps-emergency-response.apps.753d.openshift.opentlc.com";
     WebClient client = null;
     boolean isEnabled = false;
@@ -61,7 +61,8 @@ public class SendIncident extends AbstractVerticle {
                 .post(80, host, uri)
                 .sendJsonObject(JsonObject.mapFrom(v), ar -> {
                             if (ar.succeeded()) {
-                                System.out.println("incident sent "+v.toString());
+                                HttpResponse<Buffer> response = ar.result();
+                                System.out.println("Got HTTP response with status " + response.statusCode());
                             }
                             else System.out.println("incident send request failed "+v.toString());
                         });
@@ -69,6 +70,4 @@ public class SendIncident extends AbstractVerticle {
 
         }
     }
-
-
 }
