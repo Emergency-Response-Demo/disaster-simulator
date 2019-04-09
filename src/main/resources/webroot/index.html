@@ -50,7 +50,7 @@
     $(document).ready(function() {
        $("#invoke").click(function(e) {
           var n = $("#name").val() || "10";
-          $.getJSON("/api/greeting?name=" + n, function(res) {
+          $.getJSON("/api/generate?name=" + n, function(res) {
               $("#greeting-result").text(JSON.stringify(res));
           });
           e.preventDefault();
