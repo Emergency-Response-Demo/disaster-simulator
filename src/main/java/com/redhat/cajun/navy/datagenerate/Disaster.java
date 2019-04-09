@@ -26,6 +26,7 @@ public class Disaster {
 
         v.setVictimPhoneNumber(GeneratePhoneNumbers.getNextPhoneNumber());
         v.setNumberOfPeople(new Random().nextInt(10));
+        v.setMedicalNeeded(new Random().nextBoolean());
 
         return v;
     }

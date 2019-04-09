@@ -10,6 +10,7 @@ import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.StaticHandler;
 import rx.Observable;
 
+import java.util.HashSet;
 import java.util.List;
 
 import static io.vertx.core.http.HttpHeaders.CONTENT_TYPE;
@@ -17,6 +18,8 @@ import static io.vertx.core.http.HttpHeaders.CONTENT_TYPE;
 public class HttpApplication extends AbstractVerticle {
 
     private static Disaster disaster = null;
+
+    private HashSet<Victim> victims = new HashSet<Victim>();
 
     @Override
     public void start(Future<Void> future) {
@@ -27,6 +30,7 @@ public class HttpApplication extends AbstractVerticle {
         Router router = Router.router(vertx);
 
         router.get("/api/generate").handler(this::generate);
+        router.get("/api/lastrun").handler(this::lastrun);
         router.get("/*").handler(StaticHandler.create());
 
         // Create the HTTP server and pass the "accept" method to the request handler.
@@ -43,8 +47,14 @@ public class HttpApplication extends AbstractVerticle {
                         });
     }
 
-    private void generate(RoutingContext rc) {
+    private void lastrun(RoutingContext rc) {
+        rc.response()
+                .putHeader(CONTENT_TYPE, "application/json; charset=utf-8")
+                .end(Json.encodePrettily(victims));
+    }
 
+    private void generate(RoutingContext rc) {
+        victims.clear();
         String name = rc.request().getParam("name");
         if (name == null) {
             name = "10";
@@ -64,7 +74,7 @@ public class HttpApplication extends AbstractVerticle {
         }
 
         JsonObject response = new JsonObject()
-                .put("content/json", "If enabled, requests are sent to incident service, check logs for more details on the requests");
+                .put("content/json", "If enabled, requests are sent to incident service, check logs for more details on the requests or endpoint [api/lastrun]");
 
         rc.response()
                 .putHeader(CONTENT_TYPE, "application/json; charset=utf-8")
@@ -76,6 +86,7 @@ public class HttpApplication extends AbstractVerticle {
         vertx.eventBus().send("incident-queue", victim.toString(), options, reply -> {
             if (reply.succeeded()) {
                 System.out.println("Message accepted");
+                victims.add(victim);
             } else {
                 System.out.println("Message not accepted");
             }
