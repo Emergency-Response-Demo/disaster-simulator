@@ -48,10 +48,13 @@ If you have a single-node OpenShift cluster, such as Minishift or Red Hat Contai
 
 To deploy your booster to a running single-node OpenShift cluster:
 [source,bash,options="nowrap",subs="attributes+"]
+
 ----
 $ oc login -u developer -p developer
 
 $ oc new-project MY_PROJECT_NAME
+
+$ oc create -f config/configmap.yml
 
 $ mvn clean fabric8:deploy -Popenshift
 ----
@@ -62,4 +65,3 @@ You can learn more about this booster and rest of the Eclipse Vert.x runtime in 
 NOTE: Run the set of integration tests included with this booster using `mvn clean verify -Popenshift,openshift-it`.
 
 
-oc create -f configmap.yml
