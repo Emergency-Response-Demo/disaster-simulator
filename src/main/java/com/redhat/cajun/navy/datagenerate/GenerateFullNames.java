@@ -37,7 +37,7 @@ public class GenerateFullNames {
     }
 
     public String getNextLastName() {
-        return fNames.get(new Random().nextInt(lNames.size()));
+        return lNames.get(new Random().nextInt(lNames.size()));
     }
 
     public String getNextFirstName() {
