@@ -2,6 +2,7 @@ package com.redhat.cajun.navy.datagenerate;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
+import io.vertx.core.Handler;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
@@ -20,6 +21,8 @@ public class HttpApplication extends AbstractVerticle {
     private static Disaster disaster = null;
 
     private HashSet<Victim> victims = new HashSet<Victim>();
+
+    private int victimCount = 0;
 
     @Override
     public void start(Future<Void> future) {
@@ -55,18 +58,27 @@ public class HttpApplication extends AbstractVerticle {
 
     private void generate(RoutingContext rc) {
         victims.clear();
-        String name = rc.request().getParam("name");
-        if (name == null) {
-            name = "10";
+
+        String numVictimsStr = rc.request().getParam("numVictims");
+        if (numVictimsStr == null) {
+            numVictimsStr = "10";
         }
 
-        List<Victim> list = null;
+        String waitTimeStr = rc.request().getParam("waitTime");
+        if (waitTimeStr == null) {
+            waitTimeStr = "1000";
+        }
+
+        victimCount = 0;
 
         try {
-            int n = Integer.parseInt(name);
-            Observable<Victim> ob = Observable.from(disaster.generateVictims(n));
-            ob.subscribe(item -> sendMessage(item), error -> error.printStackTrace(),
-                    () -> System.out.println("Done"));
+            int numVictims = Integer.parseInt(numVictimsStr);
+            final int waitTime = Integer.parseInt(waitTimeStr);
+            Observable<Victim> ob = Observable.from(disaster.generateVictims(numVictims));
+            ob.subscribe(
+                item -> {victimCount++; sendMessage(item, victimCount, waitTime);}, 
+                error -> error.printStackTrace(),
+                () -> System.out.println("Done"));
 
 
         }catch(NumberFormatException nfe){
@@ -81,14 +93,28 @@ public class HttpApplication extends AbstractVerticle {
                 .end(response.encodePrettily());
     }
 
-    public void sendMessage(Victim victim) {
-        DeliveryOptions options = new DeliveryOptions().addHeader("action", "send-incident");
-        vertx.eventBus().send("incident-queue", victim.toString(), options, reply -> {
-            if (reply.succeeded()) {
-                System.out.println("Message accepted");
-                victims.add(victim);
-            } else {
-                System.out.println("Message not accepted");
+    public void sendMessage(Victim victim, int victimCount, int delay) {
+        int waitTime = victimCount * delay;
+        // Cannot schedule a timer with delay < 1 ms, so if waitTime is 0, set it to 1.
+        if(waitTime == 0) {
+            waitTime = 1;
+        } 
+        final int calculatedWaitTime = waitTime;
+        System.out.format("send Message Called for victim %d with a delay of %d\n", victimCount, calculatedWaitTime);
+        vertx.setTimer(waitTime, new Handler<Long>() {
+            public void handle(Long timerID) {
+                System.out.format("Sending victim %d after delay of %d milliseconds\n", victimCount, calculatedWaitTime); 
+
+                DeliveryOptions options = new DeliveryOptions().addHeader("action", "send-incident");
+                vertx.eventBus().send("incident-queue", victim.toString(), options, reply -> {
+                    if (reply.succeeded()) {
+                        System.out.format("Message accepted for victim %d\n", victimCount);
+                        victims.add(victim);
+                    } else {
+                        System.out.format("Message NOT accepted for victim %d\n", victimCount);
+                    }
+                });
+        
             }
         });
 
