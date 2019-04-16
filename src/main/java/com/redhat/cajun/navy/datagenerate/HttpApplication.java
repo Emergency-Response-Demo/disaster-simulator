@@ -76,7 +76,7 @@ public class HttpApplication extends AbstractVerticle {
             final int waitTime = Integer.parseInt(waitTimeStr);
             Observable<Victim> ob = Observable.from(disaster.generateVictims(numVictims));
             ob.subscribe(
-                item -> {victimCount++; sendMessage(item, victimCount, waitTime);}, 
+                item -> {victimCount++; sendMessage(item, victimCount, waitTime);},
                 error -> error.printStackTrace(),
                 () -> System.out.println("Done"));
 
@@ -98,12 +98,12 @@ public class HttpApplication extends AbstractVerticle {
         // Cannot schedule a timer with delay < 1 ms, so if waitTime is 0, set it to 1.
         if(waitTime == 0) {
             waitTime = 1;
-        } 
+        }
         final int calculatedWaitTime = waitTime;
         System.out.format("send Message Called for victim %d with a delay of %d\n", victimCount, calculatedWaitTime);
         vertx.setTimer(waitTime, new Handler<Long>() {
             public void handle(Long timerID) {
-                System.out.format("Sending victim %d after delay of %d milliseconds\n", victimCount, calculatedWaitTime); 
+                System.out.format("Sending victim %d after delay of %d milliseconds\n", victimCount, calculatedWaitTime);
 
                 DeliveryOptions options = new DeliveryOptions().addHeader("action", "send-incident");
                 vertx.eventBus().send("incident-queue", victim.toString(), options, reply -> {
