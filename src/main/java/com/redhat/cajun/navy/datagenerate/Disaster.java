@@ -22,7 +22,7 @@ public class Disaster {
         v.setVictimName(fullNames.getNextFullName());
 
         Double point = points.getInternalPoint();
-        v.setLatLon(point.getX(),point.getY());
+        v.setLatLon(point.getY(),point.getX());
 
         v.setVictimPhoneNumber(GeneratePhoneNumbers.getNextPhoneNumber());
         v.setNumberOfPeople(new Random().nextInt(10));
