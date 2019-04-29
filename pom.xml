@@ -54,7 +54,6 @@
       <artifactId>vertx-health-check</artifactId>
     </dependency>
 
-
     <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-config</artifactId>
@@ -87,6 +86,13 @@
       <groupId>io.vertx</groupId>
       <artifactId>vertx-web-client</artifactId>
       <version>3.7.0</version>
+    </dependency>
+
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>1.7.26</version>
     </dependency>
 
 
