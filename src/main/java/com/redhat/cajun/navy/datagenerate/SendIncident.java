@@ -13,7 +13,9 @@ import io.vertx.ext.web.client.WebClient;
 public class SendIncident extends AbstractVerticle {
 
     String uri = "/incidents";
-    String host = "incident-service-naps-emergency-response.apps.753d.openshift.opentlc.com";
+    String host = "incident-service.naps-emergency-response.svc";
+    int port = 8080;
+
     WebClient client = null;
     boolean isEnabled = false;
     @Override
@@ -23,6 +25,7 @@ public class SendIncident extends AbstractVerticle {
         client = WebClient.create(vertx);
         host = config().getString("incident.service");
         uri = config().getString("incident.uri");
+        port = config().getInteger("incident.port");
         isEnabled = config().getBoolean("enabled");
         System.out.println("IncidentService located at: "+host + uri);
 
@@ -54,11 +57,10 @@ public class SendIncident extends AbstractVerticle {
 
 
     private void sendRequest(Victim v) {
-
-        System.out.println(host + uri + v);
+        System.out.println(host + ":" + port + uri + v);
         if(isEnabled){
                     client
-                .post(80, host, uri)
+                .post(port, host, uri)
                 .sendJsonObject(JsonObject.mapFrom(v), ar -> {
                             if (ar.succeeded()) {
                                 HttpResponse<Buffer> response = ar.result();
