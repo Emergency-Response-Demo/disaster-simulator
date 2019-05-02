@@ -1,22 +1,27 @@
 package com.redhat.cajun.navy.datagenerate;
 
+import static io.vertx.core.http.HttpHeaders.CONTENT_TYPE;
+
+import java.util.HashSet;
+import java.util.List;
+
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.json.Json;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.StaticHandler;
 import rx.Observable;
 
-import java.util.HashSet;
-import java.util.List;
-
-import static io.vertx.core.http.HttpHeaders.CONTENT_TYPE;
-
 public class HttpApplication extends AbstractVerticle {
+
+    private static final Logger log = LoggerFactory.getLogger(HttpApplication.class);
 
     private static Disaster disaster = null;
 
@@ -26,7 +31,6 @@ public class HttpApplication extends AbstractVerticle {
 
     @Override
     public void start(Future<Void> future) {
-        System.out.println(config());
         disaster = new Disaster(config().getString("fnames.file"), config().getString("lnames.file"));
 
         // Create a router object.
@@ -44,7 +48,7 @@ public class HttpApplication extends AbstractVerticle {
                         // Retrieve the port from the configuration, default to 8080.
                         config().getInteger("http.port", 8080), ar -> {
                             if (ar.succeeded()) {
-                                System.out.println("Server started on port " + ar.result().actualPort());
+                                log.info("Server started on port " + ar.result().actualPort());
                             }
                             future.handle(ar.mapEmpty());
                         });
@@ -59,9 +63,9 @@ public class HttpApplication extends AbstractVerticle {
     private void generate(RoutingContext rc) {
         victims.clear();
 
-        String numVictimsStr = rc.request().getParam("numVictims");
-        if (numVictimsStr == null) {
-            numVictimsStr = "10";
+        String incidentsStr = rc.request().getParam("incidents");
+        if (incidentsStr == null) {
+            incidentsStr = "10";
         }
 
         String waitTimeStr = rc.request().getParam("waitTime");
@@ -69,20 +73,34 @@ public class HttpApplication extends AbstractVerticle {
             waitTimeStr = "1000";
         }
 
+        String respondersStr = rc.request().getParam("responders");
+        if (respondersStr == null) {
+            respondersStr = "25";
+        }
+
         victimCount = 0;
 
         try {
-            int numVictims = Integer.parseInt(numVictimsStr);
+            int numVictims = Integer.parseInt(incidentsStr);
             final int waitTime = Integer.parseInt(waitTimeStr);
+            int numResponders = Integer.parseInt(respondersStr);
+            if (numResponders > 150) {
+                numResponders = 150;
+            }
+
+            sendResponderResetMessage();
+
+            List<Responder> responders = disaster.generateResponders(numResponders);
+            sendResponderInitMessage(responders);
+
             Observable<Victim> ob = Observable.from(disaster.generateVictims(numVictims));
             ob.subscribe(
                 item -> {victimCount++; sendMessage(item, victimCount, waitTime);},
-                error -> error.printStackTrace(),
-                () -> System.out.println("Done"));
+                error -> log.error("Error handling victims", error));
 
 
-        }catch(NumberFormatException nfe){
-            nfe.printStackTrace();
+        } catch(NumberFormatException nfe){
+            log.error("Number Format exception", nfe);
         }
 
         JsonObject response = new JsonObject()
@@ -93,25 +111,35 @@ public class HttpApplication extends AbstractVerticle {
                 .end(response.encodePrettily());
     }
 
-    public void sendMessage(Victim victim, int victimCount, int delay) {
+    private void sendResponderResetMessage() {
+        DeliveryOptions options = new DeliveryOptions().addHeader("action", "reset-responders");
+        vertx.eventBus().send("responder-queue", new JsonObject(), options);
+    }
+
+    private void sendResponderInitMessage(List<Responder> responders) {
+        DeliveryOptions options = new DeliveryOptions().addHeader("action", "init-responders");
+        vertx.eventBus().send("responder-queue", new JsonObject().put("responders", new JsonArray(Json.encode(responders))), options);
+    }
+
+    private void sendMessage(Victim victim, int victimCount, int delay) {
         int waitTime = victimCount * delay;
         // Cannot schedule a timer with delay < 1 ms, so if waitTime is 0, set it to 1.
         if(waitTime == 0) {
             waitTime = 1;
         }
         final int calculatedWaitTime = waitTime;
-        System.out.format("send Message Called for victim %d with a delay of %d\n", victimCount, calculatedWaitTime);
+        log.info("send Message Called for victim " + victimCount + " with a delay of " + calculatedWaitTime + " milliseconds");
         vertx.setTimer(waitTime, new Handler<Long>() {
             public void handle(Long timerID) {
-                System.out.format("Sending victim %d after delay of %d milliseconds\n", victimCount, calculatedWaitTime);
+                log.info("Sending victim " + victimCount + " after delay of " + calculatedWaitTime + " milliseconds");
 
                 DeliveryOptions options = new DeliveryOptions().addHeader("action", "send-incident");
                 vertx.eventBus().send("incident-queue", victim.toString(), options, reply -> {
                     if (reply.succeeded()) {
-                        System.out.format("Message accepted for victim %d\n", victimCount);
+                        log.info("Message accepted for victim " + victimCount);
                         victims.add(victim);
                     } else {
-                        System.out.format("Message NOT accepted for victim %d\n", victimCount);
+                        log.warn("Message NOT accepted for victim " + victimCount);
                     }
                 });
         
