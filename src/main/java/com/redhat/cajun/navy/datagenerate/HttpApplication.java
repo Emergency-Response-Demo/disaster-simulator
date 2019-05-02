@@ -88,16 +88,14 @@ public class HttpApplication extends AbstractVerticle {
                 numResponders = 150;
             }
 
-            sendResponderResetMessage();
-
             List<Responder> responders = disaster.generateResponders(numResponders);
-            sendResponderInitMessage(responders);
-
-            Observable<Victim> ob = Observable.from(disaster.generateVictims(numVictims));
-            ob.subscribe(
-                item -> {victimCount++; sendMessage(item, victimCount, waitTime);},
-                error -> log.error("Error handling victims", error));
-
+            DeliveryOptions options = new DeliveryOptions().addHeader("action", "init-responders");
+            vertx.eventBus().send("responder-queue", new JsonObject().put("responders", new JsonArray(Json.encode(responders))), options, ar -> {
+                Observable<Victim> ob = Observable.from(disaster.generateVictims(numVictims));
+                ob.subscribe(
+                        item -> {victimCount++; sendMessage(item, victimCount, waitTime);},
+                        error -> log.error("Error handling victims", error));
+            });
 
         } catch(NumberFormatException nfe){
             log.error("Number Format exception", nfe);
@@ -109,16 +107,6 @@ public class HttpApplication extends AbstractVerticle {
         rc.response()
                 .putHeader(CONTENT_TYPE, "application/json; charset=utf-8")
                 .end(response.encodePrettily());
-    }
-
-    private void sendResponderResetMessage() {
-        DeliveryOptions options = new DeliveryOptions().addHeader("action", "reset-responders");
-        vertx.eventBus().send("responder-queue", new JsonObject(), options);
-    }
-
-    private void sendResponderInitMessage(List<Responder> responders) {
-        DeliveryOptions options = new DeliveryOptions().addHeader("action", "init-responders");
-        vertx.eventBus().send("responder-queue", new JsonObject().put("responders", new JsonArray(Json.encode(responders))), options);
     }
 
     private void sendMessage(Victim victim, int victimCount, int delay) {

@@ -4,7 +4,6 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.eventbus.Message;
-import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -44,7 +43,7 @@ public class InitResponders extends AbstractVerticle {
         String action = message.headers().get("action");
         switch (action) {
             case "init-responders":
-                sendInitRespondersRequest(message.body().getJsonArray("responders"));
+                sendInitRespondersRequest(message);
                 break;
 
             case "reset-responders":
@@ -67,14 +66,16 @@ public class InitResponders extends AbstractVerticle {
         });
     }
 
-    private void sendInitRespondersRequest(JsonArray json) {
-        client.post(port, host, initPath).putHeader("Content-Type", "application/json").sendBuffer(json.toBuffer(), ar -> {
-            if (ar.succeeded()) {
-                HttpResponse<Buffer> response = ar.result();
-                log.info("Init responders: HTTP response status " + response.statusCode());
-            } else {
-                log.error("Init responders failed.", ar.cause());
-            }
+    private void sendInitRespondersRequest(Message<JsonObject> message) {
+        client.post(port, host, initPath).putHeader("Content-Type", "application/json")
+                .sendBuffer(message.body().getJsonArray("responders").toBuffer(), ar -> {
+                    if (ar.succeeded()) {
+                        HttpResponse<Buffer> response = ar.result();
+                        log.info("Init responders: HTTP response status " + response.statusCode());
+                    } else {
+                        log.error("Init responders failed.", ar.cause());
+                    }
+                    message.reply(null);
         });
     }
 }
