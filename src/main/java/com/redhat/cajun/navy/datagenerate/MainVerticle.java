@@ -57,19 +57,16 @@ public class MainVerticle extends AbstractVerticle {
 
     private void deployVerticles(JsonObject config, Future<Void> future){
 
-        Future<String> httpFuture = Future.future();
-        Future<String> incidentFuture = Future.future();
-        Future<String> responderFuture = Future.future();
-
+        Future<String> httpAppFuture = Future.future();
+        Future<String> restClientFuture = Future.future();
 
         DeploymentOptions options = new DeploymentOptions();
 
         options.setConfig(config);
-        vertx.deployVerticle(new HttpApplication(), options, httpFuture);
-        vertx.deployVerticle(new SendIncident(), options, incidentFuture);
-        vertx.deployVerticle(new InitResponders(), options, responderFuture);
+        vertx.deployVerticle(new HttpApplication(), options, httpAppFuture);
+        vertx.deployVerticle(new RestClientVerticle(), options, restClientFuture);
 
-        CompositeFuture.all(httpFuture, incidentFuture, responderFuture).setHandler(ar -> {
+        CompositeFuture.all(httpAppFuture, restClientFuture).setHandler(ar -> {
             if (ar.succeeded()) {
                 log.info("Verticles deployed successfully.");
                 future.complete();

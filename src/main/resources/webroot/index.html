@@ -44,6 +44,18 @@
                 <input type="text" class="form-control" id="responders" placeholder="25">
               </p>
               </div>
+                <div style="display: inline">
+                    <p>
+                        <label for="clearIncidents">Clear previous incidents:</label>
+                        <input type="checkbox" class="form-control" id="clearIncidents">
+                    </p>
+                </div>
+                <div style="display: inline">
+                    <p>
+                        <label for="clearMissions">Clear previous missions:</label>
+                        <input type="checkbox" class="form-control" id="clearMissions">
+                    </p>
+                </div>
             </div>
             <div>
             <button id="invoke" type="submit" class="btn btn-success">Invoke</button>
@@ -65,8 +77,11 @@
           var incidents = $("#incidents").val() || "10";
           var waitTime = $("#waitTime").val() || "1000";
           var responders = $("#responders").val() || "25";
+          var clearIncidents = $("#clearIncidents").prop("checked");
+          var clearMissions = $("#clearMissions").prop("checked");
 
-          $.getJSON("/api/generate?incidents=" + incidents + "&waitTime=" + waitTime + "&responders=" + responders, function(res) {
+          $.getJSON("/api/generate?incidents=" + incidents + "&waitTime=" + waitTime + "&responders=" + responders
+              + "&clearIncidents=" + clearIncidents + "&clearMissions=" + clearMissions, function(res) {
               $("#invocation-result").text(JSON.stringify(res));
           });
           e.preventDefault();
