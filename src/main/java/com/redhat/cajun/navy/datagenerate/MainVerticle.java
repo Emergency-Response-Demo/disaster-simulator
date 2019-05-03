@@ -8,9 +8,14 @@ import io.vertx.core.CompositeFuture;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 
 
 public class MainVerticle extends AbstractVerticle {
+
+    private static Logger log = LoggerFactory.getLogger(MainVerticle.class);
+
     @Override
     public void start(final Future<Void> future) {
 
@@ -19,7 +24,7 @@ public class MainVerticle extends AbstractVerticle {
                     if (ar.succeeded()) {
                         deployVerticles(ar.result(), future);
                     } else {
-                        System.out.println("Failed to retrieve the configuration.");
+                        log.warn("Failed to retrieve the configuration.");
                         future.fail(ar.cause());
                     }
                 });
@@ -42,7 +47,7 @@ public class MainVerticle extends AbstractVerticle {
             ConfigStoreOptions props = new ConfigStoreOptions()
                     .setType("file")
                     .setFormat("properties")
-                    .setConfig(new JsonObject().put("path", "local-app-config.properties"));
+                    .setConfig(new JsonObject().put("path", System.getProperty("vertx-config-path")));
             options.addStore(props);
         }
 
@@ -52,24 +57,21 @@ public class MainVerticle extends AbstractVerticle {
 
     private void deployVerticles(JsonObject config, Future<Void> future){
 
-        Future<String> rFuture = Future.future();
-        Future<String> cFuture = Future.future();
-
+        Future<String> httpAppFuture = Future.future();
+        Future<String> restClientFuture = Future.future();
 
         DeploymentOptions options = new DeploymentOptions();
 
         options.setConfig(config);
-        vertx.deployVerticle(new HttpApplication(), options, rFuture.completer());
-        vertx.deployVerticle(new SendIncident(), options, cFuture.completer());
+        vertx.deployVerticle(new HttpApplication(), options, httpAppFuture);
+        vertx.deployVerticle(new RestClientVerticle(), options, restClientFuture);
 
-
-
-        CompositeFuture.all(rFuture, cFuture).setHandler(ar -> {
+        CompositeFuture.all(httpAppFuture, restClientFuture).setHandler(ar -> {
             if (ar.succeeded()) {
-                System.out.println("Verticles deployed successfully.");
+                log.info("Verticles deployed successfully.");
                 future.complete();
             } else {
-                System.out.println("WARNINIG: Verticles NOT deployed successfully.");
+                log.error("WARNINIG: Verticles NOT deployed successfully.", ar.cause());
                 future.fail(ar.cause());
             }
         });
