@@ -99,7 +99,10 @@ public class HttpApplication extends AbstractVerticle {
         // Create Incidents
         Observable<Victim> ob = Observable.from(disaster.generateVictims(incidents));
         ob.subscribe(
-                item -> {victimCount++; sendMessage(item, victimCount, waitTime);},
+                item -> {
+                    victimCount++; sendMessage(item, victimCount, waitTime);
+                    victims.add(item);
+                },
                 error -> log.error("Error handling victims", error));
 
         JsonObject response = new JsonObject()
