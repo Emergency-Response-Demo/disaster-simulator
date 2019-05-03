@@ -59,6 +59,7 @@
             </div>
             <div>
             <button id="invoke" type="submit" class="btn btn-success">Invoke</button>
+            <button id="reset" type="submit" class="btn btn-success">Reset</button>
           </div>
         </form>
         <h4>Result:</h4>
@@ -82,9 +83,11 @@
 
           $.getJSON("/api/generate?incidents=" + incidents + "&waitTime=" + waitTime + "&responders=" + responders
               + "&clearIncidents=" + clearIncidents + "&clearMissions=" + clearMissions, function(res) {
-              $("#invocation-result").text(JSON.stringify(res));
+              $("#invocation-result").text(JSON.parse(JSON.stringify(res)).response);
           });
+          $("#invoke").prop("disabled", true);
           e.preventDefault();
+
        });
     });
 </script>

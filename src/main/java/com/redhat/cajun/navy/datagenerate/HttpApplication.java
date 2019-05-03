@@ -103,7 +103,7 @@ public class HttpApplication extends AbstractVerticle {
                 error -> log.error("Error handling victims", error));
 
         JsonObject response = new JsonObject()
-                .put("content/json", "If enabled, requests are sent to incident service, check logs for more details on the requests or endpoint [api/lastrun]");
+                .put("response", "Requests sent to incident service, check logs for more details on the requests or invoke the endpoint [api/lastrun]");
 
         rc.response()
                 .putHeader(CONTENT_TYPE, "application/json; charset=utf-8")
