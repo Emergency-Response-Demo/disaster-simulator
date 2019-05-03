@@ -43,8 +43,8 @@ public class Disaster {
         Responder responder = new Responder();
         Double point = points.getInternalPoint();
         responder.setId(Integer.toString(id));
-        responder.setLatitude(point.getX());
-        responder.setLongitude(point.getY());
+        responder.setLatitude(point.getY());
+        responder.setLongitude(point.getX());
         responder.setEnrolled(true);
         return responder;
     }
