@@ -2,6 +2,7 @@ package com.redhat.cajun.navy.datagenerate;
 
 import static io.vertx.core.http.HttpHeaders.CONTENT_TYPE;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -26,6 +27,7 @@ public class HttpApplication extends AbstractVerticle {
     private static Disaster disaster = null;
 
     private HashSet<Victim> victims = new HashSet<Victim>();
+    private List<Responder> respondersForLastRun = new ArrayList<>();
 
     private int victimCount = 0;
 
@@ -37,7 +39,8 @@ public class HttpApplication extends AbstractVerticle {
         Router router = Router.router(vertx);
 
         router.get("/api/generate").handler(this::generate);
-        router.get("/api/lastrun").handler(this::lastrun);
+        router.get("/api/lastrun/incidents").handler(this::lastRunIncidents);
+        router.get("/api/lastrun/responders").handler(this::lastRunResponders);
         router.get("/*").handler(StaticHandler.create());
 
         // Create the HTTP server and pass the "accept" method to the request handler.
@@ -55,10 +58,16 @@ public class HttpApplication extends AbstractVerticle {
 
     }
 
-    private void lastrun(RoutingContext rc) {
+    private void lastRunIncidents(RoutingContext rc) {
         rc.response()
                 .putHeader(CONTENT_TYPE, "application/json; charset=utf-8")
                 .end(Json.encodePrettily(victims));
+    }
+
+    private void lastRunResponders(RoutingContext rc) {
+        rc.response()
+                .putHeader(CONTENT_TYPE, "application/json; charset=utf-8")
+                .end(Json.encodePrettily(respondersForLastRun));
     }
 
     private void generate(RoutingContext rc) {
@@ -77,6 +86,8 @@ public class HttpApplication extends AbstractVerticle {
 
         // Reset responders
         List<Responder> responderList = disaster.generateResponders(responders);
+
+        respondersForLastRun = responderList;
         DeliveryOptions options = new DeliveryOptions().addHeader("action", "reset-responders");
         vertx.eventBus().send("rest-client-queue", new JsonObject().put("responders", new JsonArray(Json.encode(responderList))), options);
 
@@ -106,7 +117,7 @@ public class HttpApplication extends AbstractVerticle {
                 error -> log.error("Error handling victims", error));
 
         JsonObject response = new JsonObject()
-                .put("response", "Requests sent to incident service, check logs for more details on the requests or invoke the endpoint [api/lastrun]");
+                .put("response", "Requests sent to incident service, check logs for more details on the requests or invoke the endpoint [api/lastrun/incidents] and [api/lastrun/responders] ");
 
         rc.response()
                 .putHeader(CONTENT_TYPE, "application/json; charset=utf-8")
