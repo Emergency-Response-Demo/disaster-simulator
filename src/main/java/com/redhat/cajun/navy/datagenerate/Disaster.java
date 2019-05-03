@@ -39,22 +39,4 @@ public class Disaster {
         return victims;
     }
 
-    public Responder generateResponder(int id) {
-        Responder responder = new Responder();
-        Double point = points.getInternalPoint();
-        responder.setId(Integer.toString(id));
-        responder.setLatitude(point.getX());
-        responder.setLongitude(point.getY());
-        responder.setEnrolled(true);
-        return responder;
-    }
-
-    public List<Responder> generateResponders(int number) {
-        List<Responder> responders = new ArrayList<>();
-        for (int i = 1; i <= number; i++) {
-            responders.add(generateResponder(i));
-        }
-        return responders;
-    }
-
 }

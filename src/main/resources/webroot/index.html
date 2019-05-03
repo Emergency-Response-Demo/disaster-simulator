@@ -16,9 +16,13 @@
 
     <div>
         <div class="sect1">
+<h2 id="_http_booster">HTTP Booster</h2>
 <div class="sectionbody">
+<div class="paragraph">
+<p>An Example UI , for generating a list of Incidents that will pounce the Incident Service, Max Default at the moment is 15</p>
+</div>
 <div class="sect2">
-<h3 id="_using_the_greeting_service">Incidents and Responders</h3>
+<h3 id="_using_the_greeting_service">Number of Incidents</h3>
 
 </div>
 </div>
@@ -26,44 +30,17 @@
         
         <form class="form-inline">
             <div class="form-group">
-              <div style="display: inline">
-                <p>
-                <label for="incidents">Number of incidents:</label>
-                <input type="text" class="form-control" id="incidents" placeholder="10">
-                </p>
-              </div>
-              <div style="display: inline">
-                <p>
-                <label for="waitTime">Delay between incidents being created (milliseconds):</label>
+                <label for="name">Number</label>
+                <input type="text" class="form-control" id="name" placeholder="10">
+                <label for="waitTime">Delay between incidents being created (milliseconds)</label>
                 <input type="text" class="form-control" id="waitTime" placeholder="1000">
-              </p>
-              </div>
-              <div style="display: inline">
-                <p>
-                <label for="responders">Number of Responders:</label>
-                <input type="text" class="form-control" id="responders" placeholder="25">
-              </p>
-              </div>
-                <div style="display: inline">
-                    <p>
-                        <label for="clearIncidents">Clear previous incidents:</label>
-                        <input type="checkbox" class="form-control" id="clearIncidents" checked="checked">
-                    </p>
-                </div>
-                <div style="display: inline">
-                    <p>
-                        <label for="clearMissions">Clear previous missions:</label>
-                        <input type="checkbox" class="form-control" id="clearMissions" checked="checked">
-                    </p>
-                </div>
+
             </div>
-            <div>
             <button id="invoke" type="submit" class="btn btn-success">Invoke</button>
-            <button id="reset" type="submit" class="btn btn-success">Reset</button>
-          </div>
         </form>
-        <h4>Result:</h4>
-        <pre><code id="invocation-result">Invoke the service to see the result.</code></pre>
+
+        <h3>Result:</h3>
+        <pre><code id="greeting-result">Invoke the service to see the result.</code></pre>
     </div>
 </div>
 
@@ -75,19 +52,13 @@
 <script>
     $(document).ready(function() {
        $("#invoke").click(function(e) {
-          var incidents = $("#incidents").val() || "10";
+          var n = $("#name").val() || "10";
           var waitTime = $("#waitTime").val() || "1000";
-          var responders = $("#responders").val() || "25";
-          var clearIncidents = $("#clearIncidents").prop("checked");
-          var clearMissions = $("#clearMissions").prop("checked");
 
-          $.getJSON("/api/generate?incidents=" + incidents + "&waitTime=" + waitTime + "&responders=" + responders
-              + "&clearIncidents=" + clearIncidents + "&clearMissions=" + clearMissions, function(res) {
-              $("#invocation-result").text(JSON.parse(JSON.stringify(res)).response);
+          $.getJSON("/api/generate?numVictims=" + n + "&waitTime=" + waitTime, function(res) {
+              $("#greeting-result").text(JSON.stringify(res));
           });
-          $("#invoke").prop("disabled", true);
           e.preventDefault();
-
        });
     });
 </script>

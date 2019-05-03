@@ -1,27 +1,22 @@
 package com.redhat.cajun.navy.datagenerate;
 
-import static io.vertx.core.http.HttpHeaders.CONTENT_TYPE;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
+import io.vertx.core.Handler;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.json.Json;
-import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.StaticHandler;
 import rx.Observable;
 
-public class HttpApplication extends AbstractVerticle {
+import java.util.HashSet;
+import java.util.List;
 
-    private static final Logger log = LoggerFactory.getLogger(HttpApplication.class);
+import static io.vertx.core.http.HttpHeaders.CONTENT_TYPE;
+
+public class HttpApplication extends AbstractVerticle {
 
     private static Disaster disaster = null;
 
@@ -31,6 +26,7 @@ public class HttpApplication extends AbstractVerticle {
 
     @Override
     public void start(Future<Void> future) {
+        System.out.println(config());
         disaster = new Disaster(config().getString("fnames.file"), config().getString("lnames.file"));
 
         // Create a router object.
@@ -48,11 +44,10 @@ public class HttpApplication extends AbstractVerticle {
                         // Retrieve the port from the configuration, default to 8080.
                         config().getInteger("http.port", 8080), ar -> {
                             if (ar.succeeded()) {
-                                log.info("Server started on port " + ar.result().actualPort());
+                                System.out.println("Server started on port " + ar.result().actualPort());
                             }
-                            future.complete();
+                            future.handle(ar.mapEmpty());
                         });
-
     }
 
     private void lastrun(RoutingContext rc) {
@@ -64,78 +59,65 @@ public class HttpApplication extends AbstractVerticle {
     private void generate(RoutingContext rc) {
         victims.clear();
 
-        int incidents = toInteger(rc.request().getParam("incidents")).orElse(10);
-        int waitTime = toInteger(rc.request().getParam("waitTime")).orElse(1000);
-        int responders = toInteger(rc.request().getParam("responders")).orElse(25);
-        boolean clearIncidents = Boolean.valueOf(rc.request().getParam("clearIncidents"));
-        boolean clearMissions = Boolean.valueOf(rc.request().getParam("clearMissions"));
+        String numVictimsStr = rc.request().getParam("numVictims");
+        if (numVictimsStr == null) {
+            numVictimsStr = "10";
+        }
 
-        log.info("Simulator called with incidents = " + incidents + ", wait time = " + waitTime + ", responders = "
-                + responders + ", clear incidents = " + clearIncidents + ", clear missions = " + clearMissions);
+        String waitTimeStr = rc.request().getParam("waitTime");
+        if (waitTimeStr == null) {
+            waitTimeStr = "1000";
+        }
 
         victimCount = 0;
 
-        // Reset responders
-        List<Responder> responderList = disaster.generateResponders(responders);
-        DeliveryOptions options = new DeliveryOptions().addHeader("action", "reset-responders");
-        vertx.eventBus().send("rest-client-queue", new JsonObject().put("responders", new JsonArray(Json.encode(responderList))), options);
-
-        // Reset incidents
-        if (clearIncidents) {
-            options = new DeliveryOptions().addHeader("action", "reset-incidents");
-            vertx.eventBus().send("rest-client-queue", new JsonObject(), options);
-        }
-
-        // Reset Incident Priority
-        options = new DeliveryOptions().addHeader("action", "reset-incident-priority");
-        vertx.eventBus().send("rest-client-queue", new JsonObject(), options);
-
-        // Reset missions
-        if (clearMissions) {
-            options = new DeliveryOptions().addHeader("action", "reset-missions");
-            vertx.eventBus().send("rest-client-queue", new JsonObject(), options);
-        }
-
-        // Create Incidents
-        Observable<Victim> ob = Observable.from(disaster.generateVictims(incidents));
-        ob.subscribe(
+        try {
+            int numVictims = Integer.parseInt(numVictimsStr);
+            final int waitTime = Integer.parseInt(waitTimeStr);
+            Observable<Victim> ob = Observable.from(disaster.generateVictims(numVictims));
+            ob.subscribe(
                 item -> {victimCount++; sendMessage(item, victimCount, waitTime);},
-                error -> log.error("Error handling victims", error));
+                error -> error.printStackTrace(),
+                () -> System.out.println("Done"));
+
+
+        }catch(NumberFormatException nfe){
+            nfe.printStackTrace();
+        }
 
         JsonObject response = new JsonObject()
-                .put("response", "Requests sent to incident service, check logs for more details on the requests or invoke the endpoint [api/lastrun]");
+                .put("content/json", "If enabled, requests are sent to incident service, check logs for more details on the requests or endpoint [api/lastrun]");
 
         rc.response()
                 .putHeader(CONTENT_TYPE, "application/json; charset=utf-8")
                 .end(response.encodePrettily());
     }
 
-    private void sendMessage(Victim victim, int victimCount, int delay) {
+    public void sendMessage(Victim victim, int victimCount, int delay) {
         int waitTime = victimCount * delay;
         // Cannot schedule a timer with delay < 1 ms, so if waitTime is 0, set it to 1.
         if(waitTime == 0) {
             waitTime = 1;
         }
         final int calculatedWaitTime = waitTime;
-        log.info("Send message called for victim " + victimCount + " with a delay of " + calculatedWaitTime + " milliseconds");
-        vertx.setTimer(waitTime, timerID -> {
-            log.info("Sending victim " + victimCount + " after delay of " + calculatedWaitTime + " milliseconds");
+        System.out.format("send Message Called for victim %d with a delay of %d\n", victimCount, calculatedWaitTime);
+        vertx.setTimer(waitTime, new Handler<Long>() {
+            public void handle(Long timerID) {
+                System.out.format("Sending victim %d after delay of %d milliseconds\n", victimCount, calculatedWaitTime);
 
-            DeliveryOptions options = new DeliveryOptions().addHeader("action", "create-incident");
-            vertx.eventBus().send("rest-client-queue", new JsonObject(Json.encode(victim)), options);
+                DeliveryOptions options = new DeliveryOptions().addHeader("action", "send-incident");
+                vertx.eventBus().send("incident-queue", victim.toString(), options, reply -> {
+                    if (reply.succeeded()) {
+                        System.out.format("Message accepted for victim %d\n", victimCount);
+                        victims.add(victim);
+                    } else {
+                        System.out.format("Message NOT accepted for victim %d\n", victimCount);
+                    }
+                });
+        
+            }
         });
 
-    }
-
-    private Optional<Integer> toInteger(String intStr) {
-        if (intStr == null) {
-            return Optional.empty();
-        }
-        try {
-            return Optional.of(Integer.parseInt(intStr));
-        } catch (NumberFormatException nfe) {
-            return Optional.empty();
-        }
     }
 
 }
