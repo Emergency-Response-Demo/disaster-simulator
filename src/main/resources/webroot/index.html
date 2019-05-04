@@ -112,7 +112,7 @@
       <!-- Clear previous missions form -->
       <div class="card" style="margin-bottom: 20px;">
         <div class="card-header">
-          Create incidents
+          Create missions
         </div>
         <div class="card-body">
           <form>
@@ -142,7 +142,7 @@
         var incidentDelay = $("#incidentDelay").val() || "1000";
         var endpoint = `/g/incidents?incidents=${incidentCount}&waitTime=${incidentDelay}`;
         $.getJSON(endpoint, function (resp) {
-          $("#result").text(JSON.parse(JSON.stringify(resp)).response);
+          $("#result").text(JSON.parse(JSON.stringify(resp)));
         });
       });
 
@@ -152,7 +152,7 @@
         var responderCount = $("#responderCount").val() || "25";
         var endpoint = `/g/responders?responders=${responderCount}`;
         $.getJSON(endpoint, function (resp) {
-          $("#result").text(JSON.parse(JSON.stringify(resp)).response);
+          $("#result").text(JSON.parse(JSON.stringify(resp)));
         });
       });
 
@@ -161,16 +161,16 @@
 
         var endpoint = '/c/incidents?clearIncidents=true';
         $.getJSON(endpoint, function (resp) {
-          $("#result").text(JSON.parse(JSON.stringify(resp)).response);
+          $("#result").text(JSON.parse(JSON.stringify(resp)));
         });
       });
 
       $("#clearPreviousMissions").click(function (e) {
         e.preventDefault();
 
-        var endpoint = '/c/incidents?clearMissions=true';
+        var endpoint = '/c/missions?clearMissions=true';
         $.getJSON(endpoint, function (resp) {
-          $("#result").text(JSON.parse(JSON.stringify(resp)).response);
+          $("#result").text(JSON.parse(JSON.stringify(resp)));
         });
       });
     });
