@@ -31,16 +31,23 @@ public class HttpApplication extends AbstractVerticle {
 
     private int victimCount = 0;
 
+    private boolean isDryRun = false;
+
     @Override
     public void start(Future<Void> future) {
         disaster = new Disaster(config().getString("fnames.file"), config().getString("lnames.file"));
+        isDryRun = config().getBoolean("is.dryrun", false);
 
         // Create a router object.
         Router router = Router.router(vertx);
 
-        router.get("/api/generate").handler(this::generate);
-        router.get("/api/lastrun/incidents").handler(this::lastRunIncidents);
-        router.get("/api/lastrun/responders").handler(this::lastRunResponders);
+        router.get("/g/incidents").handler(this::generateIncidents);
+        router.get("/g/responders").handler(this::generateResponders);
+        router.get("/c/incidents").handler(this::clearIncidents);
+        router.get("/c/missions").handler(this::clearMissions);
+
+        router.get("/g/incidents/lastrun").handler(this::lastRunIncidents);
+        router.get("/g/responders/lastrun").handler(this::lastRunResponders);
         router.get("/*").handler(StaticHandler.create());
 
         // Create the HTTP server and pass the "accept" method to the request handler.
@@ -55,6 +62,8 @@ public class HttpApplication extends AbstractVerticle {
                             }
                             future.complete();
                         });
+        if(isDryRun)
+            log.info("CHECK ConfigMap: running in Dry Run mode!! is.dryrun="+isDryRun);
 
     }
 
@@ -70,59 +79,106 @@ public class HttpApplication extends AbstractVerticle {
                 .end(Json.encodePrettily(respondersForLastRun));
     }
 
-    private void generate(RoutingContext rc) {
-        victims.clear();
 
-        int incidents = toInteger(rc.request().getParam("incidents")).orElse(10);
-        int waitTime = toInteger(rc.request().getParam("waitTime")).orElse(1000);
+    private void clearMissions(RoutingContext routingContext){
+        if(!isDryRun) {
+            boolean clearMissions = Boolean.valueOf(routingContext.request().getParam("clearMissions"));
+            // Reset missions
+            if (clearMissions) {
+                DeliveryOptions options = new DeliveryOptions().addHeader("action", "reset-missions");
+                vertx.eventBus().send("rest-client-queue", new JsonObject(), options);
+            }
+        }
+        JsonObject response = new JsonObject()
+                .put("response", "Requests sent to mission service, it will complete all missions and clear the cache. check logs for more details..")
+                .put("isDryRun", isDryRun);
+
+        routingContext.response()
+                .putHeader(CONTENT_TYPE, "application/json; charset=utf-8")
+                .end(response.encodePrettily());
+
+    }
+
+    private void clearIncidents(RoutingContext routingContext){
+        if(!isDryRun) {
+            boolean clearIncidents = Boolean.valueOf(routingContext.request().getParam("clearIncidents"));
+            // Reset incidents
+            if (clearIncidents) {
+                DeliveryOptions options = new DeliveryOptions().addHeader("action", "reset-incidents");
+                vertx.eventBus().send("rest-client-queue", new JsonObject(), options);
+
+                // Reset Incident Priority
+                options = new DeliveryOptions().addHeader("action", "reset-incident-priority");
+                vertx.eventBus().send("rest-client-queue", new JsonObject(), options);
+            }
+        }
+        JsonObject response = new JsonObject()
+                .put("response", "Requests sent to incident service, check logs for more details..")
+                .put("isDryRun", isDryRun);
+
+        routingContext.response()
+                .putHeader(CONTENT_TYPE, "application/json; charset=utf-8")
+                .end(response.encodePrettily());
+
+    }
+
+    private void generateResponders(RoutingContext rc) {
         int responders = toInteger(rc.request().getParam("responders")).orElse(25);
-        boolean clearIncidents = Boolean.valueOf(rc.request().getParam("clearIncidents"));
-        boolean clearMissions = Boolean.valueOf(rc.request().getParam("clearMissions"));
-
-        log.info("Simulator called with incidents = " + incidents + ", wait time = " + waitTime + ", responders = "
-                + responders + ", clear incidents = " + clearIncidents + ", clear missions = " + clearMissions);
-
-        victimCount = 0;
 
         // Reset responders
         List<Responder> responderList = disaster.generateResponders(responders);
 
         respondersForLastRun = responderList;
+        if(!isDryRun){
         DeliveryOptions options = new DeliveryOptions().addHeader("action", "reset-responders");
         vertx.eventBus().send("rest-client-queue", new JsonObject().put("responders", new JsonArray(Json.encode(responderList))), options);
-
-        // Reset incidents
-        if (clearIncidents) {
-            options = new DeliveryOptions().addHeader("action", "reset-incidents");
-            vertx.eventBus().send("rest-client-queue", new JsonObject(), options);
         }
-
-        // Reset Incident Priority
-        options = new DeliveryOptions().addHeader("action", "reset-incident-priority");
-        vertx.eventBus().send("rest-client-queue", new JsonObject(), options);
-
-        // Reset missions
-        if (clearMissions) {
-            options = new DeliveryOptions().addHeader("action", "reset-missions");
-            vertx.eventBus().send("rest-client-queue", new JsonObject(), options);
-        }
-
-        // Create Incidents
-        Observable<Victim> ob = Observable.from(disaster.generateVictims(incidents));
-        ob.subscribe(
-                item -> {
-                    victimCount++; sendMessage(item, victimCount, waitTime);
-                    victims.add(item);
-                },
-                error -> log.error("Error handling victims", error));
 
         JsonObject response = new JsonObject()
-                .put("response", "Requests sent to incident service, check logs for more details on the requests or invoke the endpoint [api/lastrun/incidents] and [api/lastrun/responders] ");
+                .put("response", "Requests sent to responder service, check logs for more details on the requests or invoke the endpoint [/api/lastrun/responders] ")
+                .put("isDryRun", isDryRun);
 
         rc.response()
                 .putHeader(CONTENT_TYPE, "application/json; charset=utf-8")
                 .end(response.encodePrettily());
     }
+
+
+    private void generateIncidents(RoutingContext rc) {
+
+        victims.clear();
+
+        int numVictims = toInteger(rc.request().getParam("incidents")).orElse(10);
+        int waitTime = toInteger(rc.request().getParam("waitTime")).orElse(1000);
+
+        victimCount = 0;
+
+        try {
+
+            Observable<Victim> ob = Observable.from(disaster.generateVictims(numVictims));
+            ob.subscribe(
+                    item -> {victimCount++;
+                    if(!isDryRun)
+                        sendMessage(item, victimCount, waitTime);
+                    victims.add(item);
+                    },
+                    error -> error.printStackTrace(),
+                    () -> System.out.println("Done"));
+
+
+        }catch(NumberFormatException nfe){
+            nfe.printStackTrace();
+        }
+
+        JsonObject response = new JsonObject()
+                .put("content/json", "If enabled, requests are sent to incident service, check logs for more details on the requests or endpoint [/api/lastrun]")
+                .put("isDryRun", isDryRun);
+
+        rc.response()
+                .putHeader(CONTENT_TYPE, "application/json; charset=utf-8")
+                .end(response.encodePrettily());
+    }
+
 
     private void sendMessage(Victim victim, int victimCount, int delay) {
         int waitTime = victimCount * delay;
