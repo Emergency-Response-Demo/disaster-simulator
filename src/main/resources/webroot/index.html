@@ -2,95 +2,179 @@
 
 <head>
 
-    <meta charset="utf-8">
-    <title>Vert.x HTTP Booster</title>
+  <meta charset="utf-8">
+  <title>Vert.x HTTP Booster</title>
 
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
-          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <link rel="stylesheet"
+    href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+    crossorigin="anonymous">
+
 
 </head>
 
 <body>
 
-<div class="container">
+  <div class="container">
 
     <div>
-        <div class="sect1">
-<div class="sectionbody">
-<div class="sect2">
-<h3 id="_using_the_greeting_service">Incidents and Responders</h3>
+      <div class="sect1">
+        <div class="sectionbody">
+          <div class="sect2">
+            <h3 id="_using_the_greeting_service">Incidents and Responders</h3>
 
-</div>
-</div>
-</div>
-        
-        <form class="form-inline">
+          </div>
+        </div>
+      </div>
+
+      <!-- Result-->
+      <div class="card" style="margin-bottom: 20px;">
+        <div class="card-header">
+          Result
+        </div>
+        <div class="card-body">
+          <pre><code id="result">Invoke the service to see the result.</code></pre>
+        </div>
+      </div>
+
+      <!-- Add incidents form -->
+      <div class="card" style="margin-bottom: 20px;">
+        <div class="card-header">
+          Create incidents
+        </div>
+        <div class="card-body">
+          <form>
             <div class="form-group">
               <div style="display: inline">
                 <p>
-                <label for="incidents">Number of incidents:</label>
-                <input type="text" class="form-control" id="incidents" placeholder="10">
+                  <label for="incidentCount">Number of incidents:</label>
+                  <input type="text" class="form-control" id="incidentCount"
+                    placeholder="10">
                 </p>
               </div>
               <div style="display: inline">
                 <p>
-                <label for="waitTime">Delay between incidents being created (milliseconds):</label>
-                <input type="text" class="form-control" id="waitTime" placeholder="1000">
-              </p>
+                  <label for="incidentDelay">Delay between incidents being
+                    created
+                    (milliseconds):</label>
+                  <input type="text" class="form-control" id="incidentDelay"
+                    placeholder="1000">
+                </p>
               </div>
-              <div style="display: inline">
-                <p>
-                <label for="responders">Number of Responders:</label>
-                <input type="text" class="form-control" id="responders" placeholder="25">
-              </p>
-              </div>
-                <div style="display: inline">
-                    <p>
-                        <label for="clearIncidents">Clear previous incidents:</label>
-                        <input type="checkbox" class="form-control" id="clearIncidents" checked="checked">
-                    </p>
-                </div>
-                <div style="display: inline">
-                    <p>
-                        <label for="clearMissions">Clear previous missions:</label>
-                        <input type="checkbox" class="form-control" id="clearMissions" checked="checked">
-                    </p>
-                </div>
             </div>
             <div>
-            <button id="invoke" type="submit" class="btn btn-success">Invoke</button>
-            <button id="reset" type="submit" class="btn btn-success">Reset</button>
-          </div>
-        </form>
-        <h4>Result:</h4>
-        <pre><code id="invocation-result">Invoke the service to see the result.</code></pre>
+              <button id="createIncidents" type="submit"
+                class="btn btn-success">Submit</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Add responders form -->
+      <div class="card" style="margin-bottom: 20px;">
+        <div class="card-header">
+          Create responders
+        </div>
+        <div class="card-body">
+          <form>
+            <div class="form-group">
+              <div style="display: inline">
+                <p>
+                  <label for="responderCount">Number of Responders:</label>
+                  <input type="text" class="form-control" id="responderCount"
+                    placeholder="25">
+                </p>
+              </div>
+            </div>
+            <div>
+              <button id="createResponders" type="submit"
+                class="btn btn-success">Submit</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom: 20px;">
+        <div class="card-header">
+          Clear incidents
+        </div>
+        <div class="card-body">
+          <!-- Clear previous incidents form -->
+          <form>
+            <div>
+              <button id="clearPreviousIncidents" type="submit"
+                class="btn btn-success">Clear incidents</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Clear previous missions form -->
+      <div class="card" style="margin-bottom: 20px;">
+        <div class="card-header">
+          Create incidents
+        </div>
+        <div class="card-body">
+          <form>
+            <div>
+              <button id="clearPreviousMissions" type="submit"
+                class="btn btn-success">Clear missions</button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
-</div>
+  </div>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
-        integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
-        crossorigin="anonymous"></script>
+  <script
+    src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script
+    src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+    integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+    crossorigin="anonymous"></script>
 
-<script>
-    $(document).ready(function() {
-       $("#invoke").click(function(e) {
-          var incidents = $("#incidents").val() || "10";
-          var waitTime = $("#waitTime").val() || "1000";
-          var responders = $("#responders").val() || "25";
-          var clearIncidents = $("#clearIncidents").prop("checked");
-          var clearMissions = $("#clearMissions").prop("checked");
+  <script>
+    $(document).ready(function () {
+      $("#createIncidents").click(function (e) {
+        e.preventDefault();
 
-          $.getJSON("/api/generate?incidents=" + incidents + "&waitTime=" + waitTime + "&responders=" + responders
-              + "&clearIncidents=" + clearIncidents + "&clearMissions=" + clearMissions, function(res) {
-              $("#invocation-result").text(JSON.parse(JSON.stringify(res)).response);
-          });
-          $("#invoke").prop("disabled", true);
-          e.preventDefault();
+        var incidentCount = $("#incidentCount").val() || "10";
+        var incidentDelay = $("#incidentDelay").val() || "1000";
+        var endpoint = `/g/incidents?incidents=${incidentCount}&waitTime=${incidentDelay}`;
+        $.getJSON(endpoint, function (resp) {
+          $("#result").text(JSON.parse(JSON.stringify(resp)).response);
+        });
+      });
 
-       });
+      $("#createResponders").click(function (e) {
+        e.preventDefault();
+
+        var responderCount = $("#responderCount").val() || "25";
+        var endpoint = `/g/responders?responders=${responderCount}`;
+        $.getJSON(endpoint, function (resp) {
+          $("#result").text(JSON.parse(JSON.stringify(resp)).response);
+        });
+      });
+
+      $("#clearPreviousIncidents").click(function (e) {
+        e.preventDefault();
+
+        var endpoint = '/c/incidents?clearIncidents=true';
+        $.getJSON(endpoint, function (resp) {
+          $("#result").text(JSON.parse(JSON.stringify(resp)).response);
+        });
+      });
+
+      $("#clearPreviousMissions").click(function (e) {
+        e.preventDefault();
+
+        var endpoint = '/c/incidents?clearMissions=true';
+        $.getJSON(endpoint, function (resp) {
+          $("#result").text(JSON.parse(JSON.stringify(resp)).response);
+        });
+      });
     });
-</script>
+  </script>
 
 </body>
 
