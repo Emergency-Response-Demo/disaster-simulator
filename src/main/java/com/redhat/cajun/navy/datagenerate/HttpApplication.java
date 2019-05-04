@@ -44,6 +44,7 @@ public class HttpApplication extends AbstractVerticle {
         router.get("/g/incidents").handler(this::generateIncidents);
         router.get("/g/responders").handler(this::generateResponders);
         router.get("/c/incidents").handler(this::clearIncidents);
+        router.get("/c/responders").handler(this::clearResponders);
         router.get("/c/missions").handler(this::clearMissions);
 
         router.get("/g/incidents/lastrun").handler(this::lastRunIncidents);
@@ -122,14 +123,33 @@ public class HttpApplication extends AbstractVerticle {
 
     }
 
+    private void clearResponders(RoutingContext routingContext){
+        if(!isDryRun) {
+            boolean clearResponders = Boolean.valueOf(routingContext.request().getParam("clearResponders"));
+            // Reset incidents
+            if (clearResponders) {
+                DeliveryOptions options = new DeliveryOptions().addHeader("action", "clear-responders");
+                vertx.eventBus().send("rest-client-queue", new JsonObject(), options);
+            }
+        }
+        JsonObject response = new JsonObject()
+                .put("response", "Clear request sent to Responder Service, check logs for more details..")
+                .put("isDryRun", isDryRun);
+
+        routingContext.response()
+                .putHeader(CONTENT_TYPE, "application/json; charset=utf-8")
+                .end(response.encodePrettily());
+
+    }
+
     private void generateResponders(RoutingContext routingContext) {
         int responders = toInteger(routingContext.request().getParam("responders")).orElse(25);
-        boolean clearResponders = Boolean.valueOf(routingContext.request().getParam("clearResponders"));
+        boolean resetResponders = Boolean.valueOf(routingContext.request().getParam("resetResponders"));
 
         respondersForLastRun = new ArrayList<>();
 
         if(!isDryRun){
-            if (clearResponders) {
+            if (resetResponders) {
                 DeliveryOptions options = new DeliveryOptions().addHeader("action", "reset-responders");
                 vertx.eventBus().send("rest-client-queue", new JsonObject(), options);
             }
