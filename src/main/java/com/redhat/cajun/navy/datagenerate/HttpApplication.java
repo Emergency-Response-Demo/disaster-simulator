@@ -135,7 +135,7 @@ public class HttpApplication extends AbstractVerticle {
         }
 
         JsonObject response = new JsonObject()
-                .put("response", "Requests sent to responder service, check logs for more details on the requests or invoke the endpoint [/api/lastrun/responders] ")
+                .put("response", "Requests sent to responder service, check logs for more details on the requests or invoke the endpoint [/g/responders/lastrun] ")
                 .put("isDryRun", isDryRun);
 
         rc.response()
@@ -163,7 +163,7 @@ public class HttpApplication extends AbstractVerticle {
                     victims.add(item);
                     },
                     error -> error.printStackTrace(),
-                    () -> System.out.println("Done"));
+                    () -> log.info("Incidents generated"));
 
 
         }catch(NumberFormatException nfe){
@@ -171,7 +171,7 @@ public class HttpApplication extends AbstractVerticle {
         }
 
         JsonObject response = new JsonObject()
-                .put("content/json", "If enabled, requests are sent to incident service, check logs for more details on the requests or endpoint [/api/lastrun]")
+                .put("response", "If enabled, requests are sent to incident service, check logs for more details on the requests or endpoint [/g/incidents/lastrun]")
                 .put("isDryRun", isDryRun);
 
         rc.response()
