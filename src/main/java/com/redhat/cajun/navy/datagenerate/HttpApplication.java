@@ -122,23 +122,38 @@ public class HttpApplication extends AbstractVerticle {
 
     }
 
-    private void generateResponders(RoutingContext rc) {
-        int responders = toInteger(rc.request().getParam("responders")).orElse(25);
+    private void generateResponders(RoutingContext routingContext) {
+        int responders = toInteger(routingContext.request().getParam("responders")).orElse(25);
+        boolean clearResponders = Boolean.valueOf(routingContext.request().getParam("clearResponders"));
 
         // Reset responders
         List<Responder> responderList = disaster.generateResponders(responders);
 
-        respondersForLastRun = responderList;
+        respondersForLastRun = new ArrayList<>();
+
         if(!isDryRun){
-        DeliveryOptions options = new DeliveryOptions().addHeader("action", "reset-responders");
-        vertx.eventBus().send("rest-client-queue", new JsonObject().put("responders", new JsonArray(Json.encode(responderList))), options);
+            if(clearResponders) {
+                DeliveryOptions options = new DeliveryOptions().addHeader("action", "reset-responders");
+                vertx.eventBus().send("rest-client-queue", new JsonObject().put("responders", new JsonArray(Json.encode(responderList))), options);
+            }
+            else {
+                Observable<Responder> ob = Observable.from(disaster.generateResponder(new Long(responders)));
+                ob.subscribe(
+                        item -> {
+                            sendMessage(item);
+                            respondersForLastRun.add(item);
+                            log.debug("message sent for "+item);
+                        },
+                        error -> error.printStackTrace(),
+                        () -> log.info("Incidents generated"));
+            }
         }
 
         JsonObject response = new JsonObject()
                 .put("response", "Requests sent to responder service, check logs for more details on the requests or invoke the endpoint [/g/responders/lastrun] ")
                 .put("isDryRun", isDryRun);
 
-        rc.response()
+        routingContext.response()
                 .putHeader(CONTENT_TYPE, "application/json; charset=utf-8")
                 .end(response.encodePrettily());
     }
@@ -177,6 +192,14 @@ public class HttpApplication extends AbstractVerticle {
         rc.response()
                 .putHeader(CONTENT_TYPE, "application/json; charset=utf-8")
                 .end(response.encodePrettily());
+    }
+
+
+
+
+    private void sendMessage(Responder r){
+        DeliveryOptions options = new DeliveryOptions().addHeader("action", "more-responders");
+        vertx.eventBus().send("rest-client-queue", new JsonObject(Json.encode(r)), options);
     }
 
 

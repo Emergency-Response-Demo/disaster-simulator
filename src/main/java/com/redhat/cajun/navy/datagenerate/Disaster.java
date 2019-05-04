@@ -31,6 +31,27 @@ public class Disaster {
         return v;
     }
 
+    public List<Responder> generateResponder(long number){
+        List<Responder> responders = new ArrayList<>();
+        for(int i=0; i<number; i++){
+            responders.add(generateResponder());
+        }
+        return responders;
+    }
+
+    public Responder generateResponder(){
+        Responder responder = new Responder();
+        Double point = points.getInternalPoint();
+        responder.setName(fullNames.getNextFullName());
+        responder.setPhoneNumber(GeneratePhoneNumbers.getNextPhoneNumber());
+        responder.setBoatCapacity(new Random().nextInt(8));
+        responder.setMedicalKit(new Random().nextBoolean());
+        responder.setLatitude(point.getY());
+        responder.setLongitude(point.getX());
+        responder.setEnrolled(true);
+        return responder;
+    }
+
 
     public List<Victim> generateVictims(int number){
         List<Victim> victims = new ArrayList<Victim>();
