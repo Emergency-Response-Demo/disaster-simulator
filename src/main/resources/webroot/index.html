@@ -83,6 +83,8 @@
                   <label for="responderCount">Number of Responders:</label>
                   <input type="text" class="form-control" id="responderCount"
                     placeholder="25">
+                  <label for="responderClear">Clear previous responders:</label>
+                  <input type="checkbox" class="form-control" id="responderClear">
                 </p>
               </div>
             </div>
@@ -150,7 +152,8 @@
         e.preventDefault();
 
         var responderCount = $("#responderCount").val() || "25";
-        var endpoint = `/g/responders?responders=${responderCount}`;
+        var responderClear = $("#responderClear").prop("checked");
+        var endpoint = `/g/responders?responders=${responderCount}&clearResponders=${responderClear}`;
         $.getJSON(endpoint, function (resp) {
           $("#result").text(JSON.stringify(resp));
         });
