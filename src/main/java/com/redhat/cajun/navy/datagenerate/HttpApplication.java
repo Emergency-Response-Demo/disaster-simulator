@@ -130,9 +130,6 @@ public class HttpApplication extends AbstractVerticle {
 
         if(!isDryRun){
             if (clearResponders) {
-                DeliveryOptions options = new DeliveryOptions().addHeader("action", "clear-responders");
-                vertx.eventBus().send("rest-client-queue", new JsonObject(), options);
-            } else {
                 DeliveryOptions options = new DeliveryOptions().addHeader("action", "reset-responders");
                 vertx.eventBus().send("rest-client-queue", new JsonObject(), options);
             }
