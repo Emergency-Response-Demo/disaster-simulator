@@ -142,7 +142,7 @@
         var incidentDelay = $("#incidentDelay").val() || "1000";
         var endpoint = `/g/incidents?incidents=${incidentCount}&waitTime=${incidentDelay}`;
         $.getJSON(endpoint, function (resp) {
-          $("#result").text(JSON.parse(JSON.stringify(resp)));
+          $("#result").text(JSON.stringify(resp));
         });
       });
 
@@ -152,7 +152,7 @@
         var responderCount = $("#responderCount").val() || "25";
         var endpoint = `/g/responders?responders=${responderCount}`;
         $.getJSON(endpoint, function (resp) {
-          $("#result").text(JSON.parse(JSON.stringify(resp)));
+          $("#result").text(JSON.stringify(resp));
         });
       });
 
@@ -161,7 +161,7 @@
 
         var endpoint = '/c/incidents?clearIncidents=true';
         $.getJSON(endpoint, function (resp) {
-          $("#result").text(JSON.parse(JSON.stringify(resp)));
+          $("#result").text(JSON.stringify(resp));
         });
       });
 
@@ -170,7 +170,7 @@
 
         var endpoint = '/c/missions?clearMissions=true';
         $.getJSON(endpoint, function (resp) {
-          $("#result").text(JSON.parse(JSON.stringify(resp)));
+          $("#result").text(JSON.stringify(resp));
         });
       });
     });
