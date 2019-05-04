@@ -25,7 +25,7 @@ public class Disaster {
         v.setLatLon(point.getY(),point.getX());
 
         v.setVictimPhoneNumber(GeneratePhoneNumbers.getNextPhoneNumber());
-        v.setNumberOfPeople(new Random().nextInt(10));
+        v.setNumberOfPeople(new Random().nextInt(10) + 1);
         v.setMedicalNeeded(new Random().nextBoolean());
 
         return v;
@@ -44,11 +44,13 @@ public class Disaster {
         Double point = points.getInternalPoint();
         responder.setName(fullNames.getNextFullName());
         responder.setPhoneNumber(GeneratePhoneNumbers.getNextPhoneNumber());
-        responder.setBoatCapacity(new Random().nextInt(8));
+        responder.setBoatCapacity(new Random().nextInt(12) + 1);
         responder.setMedicalKit(new Random().nextBoolean());
         responder.setLatitude(point.getY());
         responder.setLongitude(point.getX());
         responder.setEnrolled(true);
+        responder.setPerson(false);
+        responder.setAvailable(true);
         return responder;
     }
 
