@@ -83,8 +83,8 @@
                   <label for="responderCount">Number of Responders:</label>
                   <input type="text" class="form-control" id="responderCount"
                     placeholder="25">
-                  <label for="responderClear">Clear previous responders:</label>
-                  <input type="checkbox" class="form-control" id="responderClear">
+                  <label for="responderReset">Reset previous responders:</label>
+                  <input type="checkbox" class="form-control" id="responderReset">
                 </p>
               </div>
             </div>
@@ -106,6 +106,21 @@
             <div>
               <button id="clearPreviousIncidents" type="submit"
                 class="btn btn-success">Clear incidents</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Clear responders form -->
+      <div class="card" style="margin-bottom: 20px;">
+        <div class="card-header">
+          Clear responders
+        </div>
+        <div class="card-body">
+          <form>
+            <div>
+              <button id="clearResponders" type="submit"
+                      class="btn btn-success">Clear responders</button>
             </div>
           </form>
         </div>
@@ -152,8 +167,8 @@
         e.preventDefault();
 
         var responderCount = $("#responderCount").val() || "25";
-        var responderClear = $("#responderClear").prop("checked");
-        var endpoint = `/g/responders?responders=${responderCount}&clearResponders=${responderClear}`;
+        var responderReset = $("#responderReset").prop("checked");
+        var endpoint = `/g/responders?responders=${responderCount}&resetResponders=${responderReset}`;
         $.getJSON(endpoint, function (resp) {
           $("#result").text(JSON.stringify(resp));
         });
@@ -172,6 +187,15 @@
         e.preventDefault();
 
         var endpoint = '/c/missions?clearMissions=true';
+        $.getJSON(endpoint, function (resp) {
+          $("#result").text(JSON.stringify(resp));
+        });
+      });
+
+      $("#clearResponders").click(function (e) {
+        e.preventDefault();
+
+        var endpoint = '/c/responders?clearResponders=true';
         $.getJSON(endpoint, function (resp) {
           $("#result").text(JSON.stringify(resp));
         });

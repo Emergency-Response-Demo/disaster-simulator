@@ -31,6 +31,8 @@ public class RestClientVerticle extends AbstractVerticle {
 
     private String responderServiceResetPath;
 
+    private String responderServiceClearPath;
+
     private String missionServiceHost;
 
     private int missionServicePort;
@@ -43,7 +45,7 @@ public class RestClientVerticle extends AbstractVerticle {
 
     private String incidentPriorityServiceResetPath;
 
-    private String responderServicePath = null;
+    private String responderServiceCreatePath = null;
 
     @Override
     public void start(Future<Void> startFuture) throws Exception {
@@ -56,7 +58,8 @@ public class RestClientVerticle extends AbstractVerticle {
         responderServiceHost = config().getString("responder.service.host");
         responderServicePort = config().getInteger("responder.service.port");
         responderServiceResetPath = config().getString("responder.service.path.reset");
-        responderServicePath = config().getString("responder.service.path");
+        responderServiceClearPath = config().getString("responder.service.path.clear");
+        responderServiceCreatePath = config().getString("responder.service.path.create");
         missionServiceHost = config().getString("mission.service.host");
         missionServicePort = config().getInteger("mission.service.port");
         missionServiceResetPath = config().getString("mission.service.path.reset");
@@ -87,11 +90,15 @@ public class RestClientVerticle extends AbstractVerticle {
                 break;
 
             case "reset-responders":
-                resetResponders(message);
+                resetResponders();
                 break;
 
-            case "more-responders":
-                createResponder(message);
+            case "clear-responders":
+                clearResponders();
+                break;
+
+            case "create-responders":
+                createResponders(message);
                 break;
 
             case "reset-missions":
@@ -107,20 +114,29 @@ public class RestClientVerticle extends AbstractVerticle {
         }
     }
 
-    private void resetResponders(Message<JsonObject> message) {
+    private void resetResponders() {
         client.post(responderServicePort, responderServiceHost, responderServiceResetPath)
-                .putHeader("Content-Type", "application/json")
-                .sendBuffer(message.body().getJsonArray("responders").toBuffer(), ar -> {
+                .send(ar -> {
                     if (ar.succeeded()) {
                         HttpResponse<Buffer> response = ar.result();
-                        log.info("Init responders: HTTP response status " + response.statusCode());
+                        log.info("Reset responders: HTTP response status " + response.statusCode());
                     } else {
-                        log.error("Init responders failed.", ar.cause());
+                        log.error("Clear responders failed.", ar.cause());
                     }
                 });
     }
 
-
+    private void clearResponders() {
+        client.post(responderServicePort, responderServiceHost, responderServiceClearPath)
+                .send(ar -> {
+                    if (ar.succeeded()) {
+                        HttpResponse<Buffer> response = ar.result();
+                        log.info("Clear responders: HTTP response status " + response.statusCode());
+                    } else {
+                        log.error("Clear responders failed.", ar.cause());
+                    }
+                });
+    }
 
     private void createIncident(Message<JsonObject> message) {
         client.post(incidentServicePort, incidentServiceHost, incidentServiceCreatePath)
@@ -134,19 +150,19 @@ public class RestClientVerticle extends AbstractVerticle {
                 });
     }
 
-    private void createResponder(Message<JsonObject> message) {
+    private void createResponders(Message<JsonObject> message) {
 
-        client.post(responderServicePort, responderServiceHost, responderServicePath)
-                .sendJsonObject(message.body(), ar -> {
+        client.post(responderServicePort, responderServiceHost, responderServiceCreatePath)
+                .putHeader("Content-Type", "application/json")
+                .sendBuffer(message.body().getJsonArray("responders").toBuffer(), ar -> {
                     if (ar.succeeded()) {
                         HttpResponse<Buffer> response = ar.result();
-                        log.info("Create responder for" + message.body() + ": HTTP response status " + response.statusCode());
+                        log.info("Create responders: HTTP response status " + response.statusCode());
                     }
-                    else log.error("Create incident for" + message.body().getString("victimName") + " failed.", ar.cause());
+                    else log.error("Create Responders failed.", ar.cause());
 
                 });
     }
-
 
     private void resetIncidents() {
         client.post(incidentServicePort, incidentServiceHost, incidentServiceResetPath)

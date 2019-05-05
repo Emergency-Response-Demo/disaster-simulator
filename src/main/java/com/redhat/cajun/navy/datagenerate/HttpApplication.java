@@ -44,6 +44,7 @@ public class HttpApplication extends AbstractVerticle {
         router.get("/g/incidents").handler(this::generateIncidents);
         router.get("/g/responders").handler(this::generateResponders);
         router.get("/c/incidents").handler(this::clearIncidents);
+        router.get("/c/responders").handler(this::clearResponders);
         router.get("/c/missions").handler(this::clearMissions);
 
         router.get("/g/incidents/lastrun").handler(this::lastRunIncidents);
@@ -122,31 +123,42 @@ public class HttpApplication extends AbstractVerticle {
 
     }
 
+    private void clearResponders(RoutingContext routingContext){
+        if(!isDryRun) {
+            boolean clearResponders = Boolean.valueOf(routingContext.request().getParam("clearResponders"));
+            // Reset incidents
+            if (clearResponders) {
+                DeliveryOptions options = new DeliveryOptions().addHeader("action", "clear-responders");
+                vertx.eventBus().send("rest-client-queue", new JsonObject(), options);
+            }
+        }
+        JsonObject response = new JsonObject()
+                .put("response", "Clear request sent to Responder Service, check logs for more details..")
+                .put("isDryRun", isDryRun);
+
+        routingContext.response()
+                .putHeader(CONTENT_TYPE, "application/json; charset=utf-8")
+                .end(response.encodePrettily());
+
+    }
+
     private void generateResponders(RoutingContext routingContext) {
         int responders = toInteger(routingContext.request().getParam("responders")).orElse(25);
-        boolean clearResponders = Boolean.valueOf(routingContext.request().getParam("clearResponders"));
-
-        // Reset responders
-        List<Responder> responderList = disaster.generateResponders(responders);
+        boolean resetResponders = Boolean.valueOf(routingContext.request().getParam("resetResponders"));
 
         respondersForLastRun = new ArrayList<>();
 
         if(!isDryRun){
-            if(clearResponders) {
+            if (resetResponders) {
                 DeliveryOptions options = new DeliveryOptions().addHeader("action", "reset-responders");
-                vertx.eventBus().send("rest-client-queue", new JsonObject().put("responders", new JsonArray(Json.encode(responderList))), options);
+                vertx.eventBus().send("rest-client-queue", new JsonObject(), options);
             }
-            else {
-                Observable<Responder> ob = Observable.from(disaster.generateResponder(new Long(responders)));
-                ob.subscribe(
-                        item -> {
-                            sendMessage(item);
-                            respondersForLastRun.add(item);
-                            log.debug("message sent for "+item);
-                        },
-                        error -> error.printStackTrace(),
-                        () -> log.info("Incidents generated"));
-            }
+
+            List<Responder> responderList = disaster.generateResponders(responders);
+            respondersForLastRun.addAll(responderList);
+
+            DeliveryOptions options = new DeliveryOptions().addHeader("action", "create-responders");
+            vertx.eventBus().send("rest-client-queue", new JsonObject().put("responders", new JsonArray(Json.encode(responderList))), options);
         }
 
         JsonObject response = new JsonObject()
@@ -168,22 +180,19 @@ public class HttpApplication extends AbstractVerticle {
 
         victimCount = 0;
 
-        try {
 
-            Observable<Victim> ob = Observable.from(disaster.generateVictims(numVictims));
-            ob.subscribe(
-                    item -> {victimCount++;
+        Observable<Victim> ob = Observable.from(disaster.generateVictims(numVictims));
+        ob.subscribe(
+                item -> {
+                    victimCount++;
                     if(!isDryRun)
                         sendMessage(item, victimCount, waitTime);
                     victims.add(item);
-                    },
-                    error -> error.printStackTrace(),
-                    () -> log.info("Incidents generated"));
+                },
+                error -> log.error("Exception while generating incidents", error),
+                () -> log.info("Incidents generated"));
 
 
-        }catch(NumberFormatException nfe){
-            nfe.printStackTrace();
-        }
 
         JsonObject response = new JsonObject()
                 .put("response", "If enabled, requests are sent to incident service, check logs for more details on the requests or endpoint [/g/incidents/lastrun]")
@@ -193,15 +202,6 @@ public class HttpApplication extends AbstractVerticle {
                 .putHeader(CONTENT_TYPE, "application/json; charset=utf-8")
                 .end(response.encodePrettily());
     }
-
-
-
-
-    private void sendMessage(Responder r){
-        DeliveryOptions options = new DeliveryOptions().addHeader("action", "more-responders");
-        vertx.eventBus().send("rest-client-queue", new JsonObject(Json.encode(r)), options);
-    }
-
 
     private void sendMessage(Victim victim, int victimCount, int delay) {
         int waitTime = victimCount * delay;
