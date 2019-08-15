@@ -4,6 +4,7 @@ import java.awt.geom.Point2D.Double;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Disaster {
 
@@ -12,8 +13,8 @@ public class Disaster {
 
 
     public Disaster(String fNameFile, String lNameFile){
-            fullNames = new GenerateFullNames(fNameFile,lNameFile);
-            points = new GenerateRandomPoints();
+        fullNames = new GenerateFullNames(fNameFile,lNameFile);
+        points = new GenerateRandomPoints();
     }
 
 
@@ -25,7 +26,7 @@ public class Disaster {
         v.setLatLon(point.getY(),point.getX());
 
         v.setVictimPhoneNumber(GeneratePhoneNumbers.getNextPhoneNumber());
-        v.setNumberOfPeople(new Random().nextInt(10) + 1);
+        v.setNumberOfPeople(biasedRandom(1, 10, 1.3));
         v.setMedicalNeeded(new Random().nextBoolean());
 
         return v;
@@ -44,7 +45,7 @@ public class Disaster {
         Double point = points.getInternalPoint();
         responder.setName(fullNames.getNextFullName());
         responder.setPhoneNumber(GeneratePhoneNumbers.getNextPhoneNumber());
-        responder.setBoatCapacity(new Random().nextInt(12) + 1);
+        responder.setBoatCapacity(biasedRandom(1, 12, 0.5));
         responder.setMedicalKit(new Random().nextBoolean());
         responder.setLatitude(point.getY());
         responder.setLongitude(point.getX());
@@ -60,5 +61,11 @@ public class Disaster {
         for(int i=0; i<number; i++)
             victims.add(generateVictim());
         return victims;
+    }
+
+    protected int biasedRandom(int min, int max, double bias) {
+        double d = ThreadLocalRandom.current().nextDouble();
+        double biased = Math.pow(d, bias);
+        return (int) Math.round(min + (max-min)*biased);
     }
 }
