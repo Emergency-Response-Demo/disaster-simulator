@@ -22,7 +22,7 @@ public class GenerateFullNames {
 
     public Map<Integer, String> getMapFromFile(String fileName) {
         Map<Integer, String> temp = new HashMap<>();
-        int count = 1;
+        int count = 0;
         try {
             try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
                 for (String line; (line = br.readLine()) != null; ) {
