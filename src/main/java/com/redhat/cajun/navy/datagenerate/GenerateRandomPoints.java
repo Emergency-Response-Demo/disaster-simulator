@@ -1,8 +1,10 @@
 package com.redhat.cajun.navy.datagenerate;
 
-import java.awt.geom.Rectangle2D;
-import java.util.concurrent.ThreadLocalRandom;
 import java.awt.geom.Point2D.Double;
+import java.awt.geom.Rectangle2D;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.concurrent.ThreadLocalRandom;
 
 /*
  * Please note that x and y, which we are all pretty comfortable with in Latitude and Longitude is reversed.
@@ -29,7 +31,7 @@ public class GenerateRandomPoints {
 		try {
 			x = ThreadLocalRandom.current().nextDouble(boundingRectangle.getMinX(), boundingRectangle.getMaxX());
 			y = ThreadLocalRandom.current().nextDouble(boundingRectangle.getMinY(), boundingRectangle.getMaxY());
-			return new Double(x, y);
+			return new Double(round(x,5), round(y, 5));
 		}catch(java.lang.IllegalArgumentException e) {
 			System.err.println("You must ensure that the three or more points you pass in are not in a line");
 			throw e;
@@ -61,6 +63,14 @@ public class GenerateRandomPoints {
 			}
 		}
 		return null;
+	}
+
+	private static double round(double value, int places) {
+		if (places < 0) throw new IllegalArgumentException();
+
+		BigDecimal bd = new BigDecimal(java.lang.Double.toString(value));
+		bd = bd.setScale(places, RoundingMode.HALF_UP);
+		return bd.doubleValue();
 	}
 
 }
