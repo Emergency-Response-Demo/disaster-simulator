@@ -293,7 +293,7 @@ public class BoundingPolygon extends java.awt.geom.Path2D.Double {
 		//http://www.copypastemap.com/map.php
 		//boundingPolygon.setThreePointsArea();
 		//boundingPolygon.setThreePointsLine();
-		//boundingPolygon.setxcross();
+		boundingPolygon.setXCross();
 		//boundingPolygon.setsquare();
 		//boundingPolygon.setsTwoSquares();
 		//boundingPolygon.setsTwoSquaresWithOneInternalSquare();
