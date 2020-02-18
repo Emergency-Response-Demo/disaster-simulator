@@ -17,7 +17,7 @@ public class BoudingPolygonsTest {
 				};
 		
 		BoundingPolygons boundingPolygons = new BoundingPolygons();
-		boundingPolygons.setInclusionPolygon(setWaypoints(waypoints));
+		boundingPolygons.setInclusionPolygon(BoundingPolygons.setWaypoints(waypoints, true));
 		
 		printPolygonOutput("Simple Square Test", boundingPolygons);
 		System.err.println("");
@@ -35,7 +35,7 @@ public class BoudingPolygonsTest {
 				};
 		
 		BoundingPolygons boundingPolygons = new BoundingPolygons();
-		boundingPolygons.setInclusionPolygon(setWaypoints(waypoints));
+		boundingPolygons.setInclusionPolygon(BoundingPolygons.setWaypoints(waypoints, true));
 		
 		printPolygonOutput("Simple X Cross", boundingPolygons);
 		System.err.println("");
@@ -53,7 +53,7 @@ public class BoudingPolygonsTest {
 				};
 		
 		BoundingPolygons boundingPolygons = new BoundingPolygons();
-		boundingPolygons.setInclusionPolygon(setWaypoints(waypoints1));
+		boundingPolygons.setInclusionPolygon(BoundingPolygons.setWaypoints(waypoints1, true));
 		
 		printPolygonOutput("Simple X Cross with 1000 Points", boundingPolygons);
 
@@ -80,7 +80,7 @@ public class BoudingPolygonsTest {
 				};
 		
 		BoundingPolygons boundingPolygons = new BoundingPolygons();
-		boundingPolygons.setInclusionPolygon(setWaypoints(waypoints));
+		boundingPolygons.setInclusionPolygon(BoundingPolygons.setWaypoints(waypoints, true));
 		
 		printPolygonOutput("Test Reverse Square", boundingPolygons);
 		System.err.println("");
@@ -105,8 +105,8 @@ public class BoudingPolygonsTest {
 				};
 		
 		BoundingPolygons boundingPolygons = new BoundingPolygons();
-		boundingPolygons.setInclusionPolygon(setWaypoints(waypointsSquare1));
-		boundingPolygons.setInclusionPolygon(setWaypoints(waypointsSquare2));
+		boundingPolygons.setInclusionPolygon(BoundingPolygons.setWaypoints(waypointsSquare1, true));
+		boundingPolygons.setInclusionPolygon(BoundingPolygons.setWaypoints(waypointsSquare2, true));
 		
 		printPolygonOutput("Test Two Squares", boundingPolygons);
 		System.err.println("");
@@ -131,8 +131,8 @@ public class BoudingPolygonsTest {
 				};
 		
 		BoundingPolygons boundingPolygons = new BoundingPolygons();
-		boundingPolygons.setInclusionPolygon(setWaypoints(waypointsSquare1));
-		boundingPolygons.setInclusionPolygon(setWaypoints(waypointsSquare2));
+		boundingPolygons.setInclusionPolygon(BoundingPolygons.setWaypoints(waypointsSquare1, true));
+		boundingPolygons.setInclusionPolygon(BoundingPolygons.setWaypoints(waypointsSquare2, true));
 		
 		printPolygonOutput("Test Two Squares 100 Points", boundingPolygons);
 		
@@ -169,9 +169,9 @@ public class BoudingPolygonsTest {
 				};
 		
 		BoundingPolygons boundingPolygons = new BoundingPolygons();
-		boundingPolygons.setInclusionPolygon(setWaypoints(waypointsSquare1));
-		boundingPolygons.setInclusionPolygon(setWaypoints(waypointsSquare2));
-		boundingPolygons.setInclusionPolygon(setWaypoints(waypointsSquare3Internal));
+		boundingPolygons.setInclusionPolygon(BoundingPolygons.setWaypoints(waypointsSquare1, true));
+		boundingPolygons.setInclusionPolygon(BoundingPolygons.setWaypoints(waypointsSquare2, true));
+		boundingPolygons.setInclusionPolygon(BoundingPolygons.setWaypoints(waypointsSquare3Internal, true));
 		
 		printPolygonOutput("Test Two Squares with One Internal Square", boundingPolygons);
 		System.err.println("");
@@ -181,7 +181,7 @@ public class BoudingPolygonsTest {
 	@Test(expected = RuntimeException.class)
     public void testTwoPointsInclusion()
     {
-		System.err.println("Test Two Points, below won't print becasuse of the RuntimeException");
+		System.err.println("Test Two Points Inclusion Zone, printPolygonOutput below won't run becasuse of the RuntimeException");
 		System.err.println("");
 		System.err.println("");
 		System.err.println("");
@@ -193,7 +193,7 @@ public class BoudingPolygonsTest {
 		
 		BoundingPolygons boundingPolygons = new BoundingPolygons();
 		
-		boundingPolygons.setInclusionPolygon(setWaypoints(waypointsSquare1));
+		boundingPolygons.setInclusionPolygon(BoundingPolygons.setWaypoints(waypointsSquare1, true));
 		
 		printPolygonOutput("Test Two Points Inclusion Zone Throws Runtime Exception", boundingPolygons);
 		System.err.println("");
@@ -203,7 +203,7 @@ public class BoudingPolygonsTest {
 	@Test(expected = RuntimeException.class)
     public void testTwoPointsExclusion()
     {
-		System.err.println("Test Two Points, below won't print becasuse of the RuntimeException");
+		System.err.println("Test Two Points Exclusion Zone, printPolygonOutput below won't run becasuse of the RuntimeException");
 		System.err.println("");
 		System.err.println("");
 		System.err.println("");
@@ -215,7 +215,7 @@ public class BoudingPolygonsTest {
 		
 		BoundingPolygons boundingPolygons = new BoundingPolygons();
 		
-		boundingPolygons.setExclusionPolygon(setWaypoints(waypointsSquare1));
+		boundingPolygons.setExclusionPolygon(BoundingPolygons.setWaypoints(waypointsSquare1, true));
 		
 		printPolygonOutput("Test Two Points Exclusion Zone Throws Runtime Exception", boundingPolygons);
 		System.err.println("");
@@ -233,9 +233,41 @@ public class BoudingPolygonsTest {
 		
 		BoundingPolygons boundingPolygons = new BoundingPolygons();
 		
-		boundingPolygons.setInclusionPolygon(setWaypoints(waypointsSquare1));
+		boundingPolygons.setInclusionPolygon(BoundingPolygons.setWaypoints(waypointsSquare1, true));
 		
 		printPolygonOutput("Test Three Points In a Line", boundingPolygons);
+		System.err.println("");
+		System.err.println("");
+    }
+	
+	@Test
+	public void testThreePointsInALineTwice()
+    {
+		System.err.println("Test Three Points In a Line Twice");
+    
+		System.err.println("");
+		System.err.println("");
+		System.err.println("");
+		
+		double waypointsSquare1[][] = {
+				{34.26, -77.95},
+				{34.26, -77.82},
+				{34.26, -77.60},
+				};
+		
+		
+		double waypointsSquare2[][] = {
+				{34.5, -77.95},
+				{34.5, -77.82},
+				{34.5, -77.60},
+				};
+		
+		BoundingPolygons boundingPolygons = new BoundingPolygons();
+		
+		boundingPolygons.setInclusionPolygon(BoundingPolygons.setWaypoints(waypointsSquare1, true));
+		boundingPolygons.setInclusionPolygon(BoundingPolygons.setWaypoints(waypointsSquare2, true));
+		
+		printPolygonOutput("Test Three Points In a Line twice", boundingPolygons);
 		System.err.println("");
 		System.err.println("");
     }
@@ -248,14 +280,14 @@ public class BoudingPolygonsTest {
 		System.err.println("");
 		System.err.println("");
 		double waypointsSquare1[][] = {
-				{34.26, 77.95},
-				{34.26, 77.82},
-				{34.26, 77.60},
+				{34.26, -77.95},
+				{34.26, -77.82},
+				{34.26, -77.60},
 				};
 		
 		BoundingPolygons boundingPolygons = new BoundingPolygons();
 		
-		boundingPolygons.setInclusionPolygon(setWaypoints(waypointsSquare1));
+		boundingPolygons.setInclusionPolygon(BoundingPolygons.setWaypoints(waypointsSquare1, true));
 		
 		printPolygonOutput("Test Three Points In a Line Genereate Points", boundingPolygons);
 
@@ -290,9 +322,9 @@ public class BoudingPolygonsTest {
 				};
 		
 		BoundingPolygons boundingPolygons = new BoundingPolygons();
-		boundingPolygons.setInclusionPolygon(setWaypoints(waypointsSquare1));
-		boundingPolygons.setInclusionPolygon(setWaypoints(waypointsSquare2));
-		boundingPolygons.setInclusionPolygon(setWaypoints(waypointsSquare3Internal));
+		boundingPolygons.setInclusionPolygon(BoundingPolygons.setWaypoints(waypointsSquare1, true));
+		boundingPolygons.setInclusionPolygon(BoundingPolygons.setWaypoints(waypointsSquare2, true));
+		boundingPolygons.setInclusionPolygon(BoundingPolygons.setWaypoints(waypointsSquare3Internal, true));
 		
 		printPolygonOutput("Test Two Squares with One Internal Square with Internal Points", boundingPolygons);
 		
@@ -329,9 +361,9 @@ public class BoudingPolygonsTest {
 				};
 		
 		BoundingPolygons boundingPolygons = new BoundingPolygons();
-		boundingPolygons.setInclusionPolygon(setWaypoints(waypointsSquare1));
-		boundingPolygons.setInclusionPolygon(setWaypoints(waypointsSquare2));
-		boundingPolygons.setInclusionPolygon(setWaypoints(waypointsSquare3Internal));
+		boundingPolygons.setInclusionPolygon(BoundingPolygons.setWaypoints(waypointsSquare1, true));
+		boundingPolygons.setInclusionPolygon(BoundingPolygons.setWaypoints(waypointsSquare2, true));
+		boundingPolygons.setInclusionPolygon(BoundingPolygons.setWaypoints(waypointsSquare3Internal, true));
 		
 		printPolygonOutput("Test Two Squares with One Internal Square With For What Ever Reason The 100 Random Points Don't Work", boundingPolygons);
 		
@@ -365,9 +397,9 @@ public class BoudingPolygonsTest {
 				};
 		
 		BoundingPolygons boundingPolygons = new BoundingPolygons();
-		boundingPolygons.setInclusionPolygon(setWaypoints(waypointsSquare1));
-		boundingPolygons.setInclusionPolygon(setWaypoints(waypointsSquare2));
-		boundingPolygons.setExclusionPolygon(setWaypoints(waypointsSquare1Exclusion));
+		boundingPolygons.setInclusionPolygon(BoundingPolygons.setWaypoints(waypointsSquare1, true));
+		boundingPolygons.setInclusionPolygon(BoundingPolygons.setWaypoints(waypointsSquare2, true));
+		boundingPolygons.setExclusionPolygon(BoundingPolygons.setWaypoints(waypointsSquare1Exclusion, true));
 		
 		printPolygonOutput("Test Two Squares with One Internal Exclusion Square", boundingPolygons);
 		
@@ -407,9 +439,9 @@ public class BoudingPolygonsTest {
 				};
 		
 		BoundingPolygons boundingPolygons = new BoundingPolygons();
-		boundingPolygons.setInclusionPolygon(setWaypoints(waypointsSquare1));
-		boundingPolygons.setInclusionPolygon(setWaypoints(waypointsSquare2));
-		boundingPolygons.setExclusionPolygon(setWaypoints(waypointsSquare1Exclusion));
+		boundingPolygons.setInclusionPolygon(BoundingPolygons.setWaypoints(waypointsSquare1, true));
+		boundingPolygons.setInclusionPolygon(BoundingPolygons.setWaypoints(waypointsSquare2, true));
+		boundingPolygons.setExclusionPolygon(BoundingPolygons.setWaypoints(waypointsSquare1Exclusion, true));
 		
 		printPolygonOutput("Test Two Squares with One Exclusion Square Offset", boundingPolygons);
 		
@@ -456,10 +488,10 @@ public class BoudingPolygonsTest {
 				};
 		
 		BoundingPolygons boundingPolygons = new BoundingPolygons();
-		boundingPolygons.setInclusionPolygon(setWaypoints(waypointsSquare1));
-		boundingPolygons.setInclusionPolygon(setWaypoints(waypointsSquare2));
-		boundingPolygons.setExclusionPolygon(setWaypoints(waypointsSquare1Exclusion));
-		boundingPolygons.setExclusionPolygon(setWaypoints(waypointsSquare2Exclusion));
+		boundingPolygons.setInclusionPolygon(BoundingPolygons.setWaypoints(waypointsSquare1, true));
+		boundingPolygons.setInclusionPolygon(BoundingPolygons.setWaypoints(waypointsSquare2, true));
+		boundingPolygons.setExclusionPolygon(BoundingPolygons.setWaypoints(waypointsSquare1Exclusion, true));
+		boundingPolygons.setExclusionPolygon(BoundingPolygons.setWaypoints(waypointsSquare2Exclusion, true));
 		
 		printPolygonOutput("Test Two Squares with Two Exclusion Squares Offset", boundingPolygons);
 		
@@ -494,9 +526,9 @@ public class BoudingPolygonsTest {
 				};
 		
 		BoundingPolygons boundingPolygons = new BoundingPolygons();
-		boundingPolygons.setInclusionPolygon(setWaypoints(waypointsSquare1));
+		boundingPolygons.setInclusionPolygon(BoundingPolygons.setWaypoints(waypointsSquare1, true));
 		
-		boundingPolygons.setExclusionPolygon(setWaypoints(waypointsSquare3Exclusion));
+		boundingPolygons.setExclusionPolygon(BoundingPolygons.setWaypoints(waypointsSquare3Exclusion, true));
 		
 		printPolygonOutput("Test Two Squares with Large Exclusion, all random point generation will fail and the center of the bounding boxes will be used to return points.", boundingPolygons);
 		
@@ -574,9 +606,9 @@ public class BoudingPolygonsTest {
 					};
 			
 			BoundingPolygons boundingPolygons = new BoundingPolygons();
-			boundingPolygons.setInclusionPolygon(setWaypoints(waypointsWilmington1));
-			boundingPolygons.setInclusionPolygon(setWaypoints(waypointsWilmington2));
-			boundingPolygons.setInclusionPolygon(setWaypoints(waypointsWilmington3));
+			boundingPolygons.setInclusionPolygon(BoundingPolygons.setWaypoints(waypointsWilmington1, true));
+			boundingPolygons.setInclusionPolygon(BoundingPolygons.setWaypoints(waypointsWilmington2, true));
+			boundingPolygons.setInclusionPolygon(BoundingPolygons.setWaypoints(waypointsWilmington3, true));
 			
 			printPolygonOutput("test Willington With 100 Waypoints", boundingPolygons);
 			
@@ -641,9 +673,9 @@ public class BoudingPolygonsTest {
 					};
 			
 			BoundingPolygons boundingPolygons = new BoundingPolygons();
-			boundingPolygons.setInclusionPolygon(setWaypoints(waypointsWilmington1));
-			boundingPolygons.setInclusionPolygon(setWaypoints(waypointsWilmington2));
-			boundingPolygons.setInclusionPolygon(setWaypoints(waypointsWilmington3));
+			boundingPolygons.setInclusionPolygon(BoundingPolygons.setWaypoints(waypointsWilmington1, true));
+			boundingPolygons.setInclusionPolygon(BoundingPolygons.setWaypoints(waypointsWilmington2, true));
+			boundingPolygons.setInclusionPolygon(BoundingPolygons.setWaypoints(waypointsWilmington3, true));
 			
 			printPolygonOutput("test Willington With 1 Waypoints", boundingPolygons);
 			
@@ -708,11 +740,78 @@ public class BoudingPolygonsTest {
 					};
 			
 			BoundingPolygons boundingPolygons = new BoundingPolygons();
-			boundingPolygons.setInclusionPolygon(setWaypoints(waypointsWilmington1));
-			boundingPolygons.setInclusionPolygon(setWaypoints(waypointsWilmington2));
-			boundingPolygons.setInclusionPolygon(setWaypoints(waypointsWilmington3));
+			boundingPolygons.setInclusionPolygon(BoundingPolygons.setWaypoints(waypointsWilmington1, true));
+			boundingPolygons.setInclusionPolygon(BoundingPolygons.setWaypoints(waypointsWilmington2, true));
+			boundingPolygons.setInclusionPolygon(BoundingPolygons.setWaypoints(waypointsWilmington3, true));
 			
 			printPolygonOutput("test Willington With 1000 Waypoints", boundingPolygons);
+			
+			Waypoint[] waypoints = boundingPolygons.getInternalWaypoints(1000);
+			
+			for(Waypoint waypoint: waypoints)
+			{
+				printWaypoint(waypoint);
+							
+			}
+			
+			System.err.println("Elasped time: " + (System.currentTimeMillis() - startTime) + "ms");
+			System.err.println();
+	    }
+	
+	@Test
+	public void testWillingtonWith1000WaypointsLongitudeFirst()
+	 {
+		long startTime = System.currentTimeMillis();
+		
+			double waypointsWilmington1[][] = {
+					{-77.950, 34.260},
+					{-77.820, 34.260},
+					{-77.770, 34.240},
+					{-77.812, 34.185},
+					{-77.830, 34.195},
+					{-77.868, 34.134},
+					{-77.885, 34.081},
+					{-77.890, 34.040},
+					{-77.930, 33.960},
+					{-77.919, 34.000},
+					{-77.920, 34.050},
+					{-77.927, 34.120},
+					{-77.914, 34.126},
+					{-77.937, 34.151},
+					{-77.954, 34.190},
+					{-77.955, 34.200}
+					};
+			
+			double waypointsWilmington2[][] = {
+					{-77.981, 34.232, }, 
+					{-77.954, 34.227, },
+					{-77.965, 34.207, },
+					{-77.964, 34.183, },
+					{-77.967, 34.184, },
+					{-77.971, 34.204, },
+					{-77.975, 34.221, } 
+					};
+			
+			double waypointsWilmington3[][] = {
+					{-77.943, 34.130,}, 
+					{-77.940, 34.128,}, 
+					{-77.939, 34.120,},
+					{-77.938, 34.117,}, 
+					{-77.941, 34.112,}, 
+					{-77.944, 34.116,}, 
+					{-77.947, 34.117,}, 
+					{-77.948, 34.122,}, 
+					{-77.946, 34.124,}, 
+					{-77.942, 34.123,}, 
+					{-77.943, 34.128,}, 
+					};
+			
+			BoundingPolygons boundingPolygons = new BoundingPolygons();
+			boundingPolygons.setInclusionPolygon(BoundingPolygons.setWaypoints(waypointsWilmington1, false));
+			boundingPolygons.setInclusionPolygon(BoundingPolygons.setWaypoints(waypointsWilmington2, false));
+			boundingPolygons.setInclusionPolygon(BoundingPolygons.setWaypoints(waypointsWilmington3, false));
+			
+			printPolygonOutput("test Willington With 1000 Waypoints Longitude First", boundingPolygons);
 			
 			Waypoint[] waypoints = boundingPolygons.getInternalWaypoints(1000);
 			
@@ -757,19 +856,5 @@ public class BoudingPolygonsTest {
         System.err.println(stringBuilder.toString());
 	}
 
-	/**
-	 * Helper method to set a Waypoint Array
-	 * @param waypoints
-	 * @return
-	 */
-	private Waypoint[] setWaypoints(double waypoints[][])
-	{
-		Waypoint waypoint[] = new Waypoint[waypoints.length];
-		for(int c = 0; c < waypoints.length; c++)
-		{
-			waypoint[c] = new Waypoint(waypoints[c][0], waypoints[c][1]);
-		}
-		
-		return waypoint;
-	}
+	
 }

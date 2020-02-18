@@ -7,10 +7,8 @@ import java.awt.geom.Path2D.Double;
 
 
 public class BoundingPolygons {
-
 	private Double exclusionPolygons = null;
 	private Double inclusionPolygons = null;
-	
 
 	public void setInclusionPolygon(Waypoint waypoints[])
 	{
@@ -72,7 +70,6 @@ public class BoundingPolygons {
 			longitude = ThreadLocalRandom.current().nextDouble(boundingRectangle.getMinX(), boundingRectangle.getMaxX());
 			latitude = ThreadLocalRandom.current().nextDouble(boundingRectangle.getMinY(), boundingRectangle.getMaxY());
 			return new Waypoint(latitude, longitude);
-			//return new Waypoint(round(x,5), round(y, 5));
 		}catch(java.lang.IllegalArgumentException e) {
 			System.err.println("You must ensure that the three or more points you pass in are not in a line or that you have initilzied a proper polygon");
 			throw new RuntimeException("You must ensure that the three or more points you pass in are not in a line or that you have initilzied a proper polygon");
@@ -149,6 +146,28 @@ public class BoundingPolygons {
 		exclusionPolygons = null;
 		inclusionPolygons = null;
 	}
+	
+	/**
+	 * Helper method to set a Waypoint Array
+	 * @param waypoints
+	 * @return
+	 */
+	public static Waypoint[] setWaypoints(double waypoints[][], boolean latitudeFirst)
+	{
+		Waypoint waypoint[] = new Waypoint[waypoints.length];
+		for(int c = 0; c < waypoints.length; c++)
+		{
+			if(latitudeFirst)
+			{
+			   waypoint[c] = new Waypoint(waypoints[c][0], waypoints[c][1]);
+			}else {
+				waypoint[c] = new Waypoint(waypoints[c][1], waypoints[c][0]);
+			}
+		}
+		
+		return waypoint;
+	}
+	
 	
 	public String toString()
 	{
