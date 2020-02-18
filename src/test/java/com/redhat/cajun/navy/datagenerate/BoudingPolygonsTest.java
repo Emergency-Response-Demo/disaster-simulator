@@ -179,7 +179,7 @@ public class BoudingPolygonsTest {
     }
 	
 	@Test(expected = RuntimeException.class)
-    public void testTwoPoints()
+    public void testTwoPointsInclusion()
     {
 		System.err.println("Test Two Points, below won't print becasuse of the RuntimeException");
 		System.err.println("");
@@ -195,7 +195,29 @@ public class BoudingPolygonsTest {
 		
 		boundingPolygons.setInclusionPolygon(setWaypoints(waypointsSquare1));
 		
-		printPolygonOutput("Test Two Points Throws Runtime Exception", boundingPolygons);
+		printPolygonOutput("Test Two Points Inclusion Zone Throws Runtime Exception", boundingPolygons);
+		System.err.println("");
+		System.err.println("");
+    }
+	
+	@Test(expected = RuntimeException.class)
+    public void testTwoPointsExclusion()
+    {
+		System.err.println("Test Two Points, below won't print becasuse of the RuntimeException");
+		System.err.println("");
+		System.err.println("");
+		System.err.println("");
+
+		double waypointsSquare1[][] = {
+				{34.26, -77.95},
+				{34.26, -77.82},
+				};
+		
+		BoundingPolygons boundingPolygons = new BoundingPolygons();
+		
+		boundingPolygons.setExclusionPolygon(setWaypoints(waypointsSquare1));
+		
+		printPolygonOutput("Test Two Points Exclusion Zone Throws Runtime Exception", boundingPolygons);
 		System.err.println("");
 		System.err.println("");
     }

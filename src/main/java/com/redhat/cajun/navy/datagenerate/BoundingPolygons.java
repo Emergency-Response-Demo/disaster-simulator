@@ -9,14 +9,19 @@ import java.awt.geom.Path2D.Double;
 public class BoundingPolygons {
 
 	private Double exclusionPolygons = null;
-	private Double inclusionPolygons = new Double();
+	private Double inclusionPolygons = null;
 	
 
 	public void setInclusionPolygon(Waypoint waypoints[])
 	{
+		if(inclusionPolygons == null)
+		{
+			inclusionPolygons = new Double();	
+		}
+		
 		if(waypoints.length <= 2)
 		{
-			throw new RuntimeException("You must set at least 3 points that are not in a line to make an enclosed area");
+			throw new RuntimeException("You must set at least 3 points that are not in a line to make an inclusion zone");
 		}
 		
 		for(int c = 0; c < waypoints.length; c++)
@@ -41,7 +46,7 @@ public class BoundingPolygons {
 		
 		if(waypoints.length <= 2)
 		{
-			throw new RuntimeException("You must set at least 3 points that are not in a line to make an enclosed area");
+			throw new RuntimeException("You must set at least 3 points that are not in a line to make an exclusion zone");
 		}
 		
 		for(int c = 0; c < waypoints.length; c++)
@@ -142,7 +147,7 @@ public class BoundingPolygons {
 	public void clearCurrentPolygons()
 	{
 		exclusionPolygons = null;
-		inclusionPolygons.reset();
+		inclusionPolygons = null;
 	}
 	
 	public String toString()
