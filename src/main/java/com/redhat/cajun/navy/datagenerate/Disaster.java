@@ -5,10 +5,14 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
+
 public class Disaster {
+    private static final Logger log = LoggerFactory.getLogger(Disaster.class);
 
     private static GenerateFullNames fullNames = null;
-    public static BoundingPolygons boundingPolygons = new BoundingPolygons();
+    public BoundingPolygons boundingPolygons = new BoundingPolygons();
 
 
     public Disaster(String fNameFile, String lNameFile){
