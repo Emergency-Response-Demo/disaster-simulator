@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
@@ -17,6 +18,7 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
+import io.vertx.ext.web.client.WebClient;
 import io.vertx.ext.web.handler.StaticHandler;
 import rx.Observable;
 
@@ -172,6 +174,9 @@ public class HttpApplication extends AbstractVerticle {
 
 
     private void generateIncidents(RoutingContext rc) {
+        Disaster.boundingPolygons.clearCurrentPolygons();
+        fetchInclusionZones();
+        fetchExclusionZones();
 
         victims.clear();
 
@@ -229,6 +234,29 @@ public class HttpApplication extends AbstractVerticle {
         } catch (NumberFormatException nfe) {
             return Optional.empty();
         }
+    }
+
+    /**
+     * Update the inclusion zones associated with this disaster
+     */
+    private void fetchInclusionZones() {
+        WebClient webClient = WebClient.create(vertx);
+        webClient.get(80, "disaster-service.apps.cluster-erdemo-a3c5.erdemo-a3c5.example.opentlc.com", "/inclusion-zones").send(response -> {
+
+            ServicePolygon polygons[] = Json.decodeValue(response.result().bodyAsString(), ServicePolygon[].class);
+            for (ServicePolygon polygon : polygons) {
+                Waypoint waypoints[] = new Waypoint[polygon.getPoints().size()];
+                polygon.getPoints().stream()
+                    .map(point -> new Waypoint(point[1], point[0]))
+                    .collect(Collectors.toList())
+                    .toArray(waypoints);
+                Disaster.boundingPolygons.setInclusionPolygon(waypoints);
+            }
+        });
+    }
+
+    private void fetchExclusionZones() {
+        return;
     }
 
 }
