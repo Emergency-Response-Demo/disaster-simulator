@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
@@ -17,6 +18,7 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
+import io.vertx.ext.web.client.WebClient;
 import io.vertx.ext.web.handler.StaticHandler;
 import rx.Observable;
 
@@ -153,12 +155,14 @@ public class HttpApplication extends AbstractVerticle {
                 DeliveryOptions options = new DeliveryOptions().addHeader("action", "reset-responders");
                 vertx.eventBus().send("rest-client-queue", new JsonObject(), options);
             }
+            Future<String> polygonUpdate = updateBoundingPolygons();
+            polygonUpdate.setHandler(result -> {
+                List<Responder> responderList = disaster.generateResponders(responders);
+                respondersForLastRun.addAll(responderList);
 
-            List<Responder> responderList = disaster.generateResponders(responders);
-            respondersForLastRun.addAll(responderList);
-
-            DeliveryOptions options = new DeliveryOptions().addHeader("action", "create-responders");
-            vertx.eventBus().send("rest-client-queue", new JsonObject().put("responders", new JsonArray(Json.encode(responderList))), options);
+                DeliveryOptions options = new DeliveryOptions().addHeader("action", "create-responders");
+                vertx.eventBus().send("rest-client-queue", new JsonObject().put("responders", new JsonArray(Json.encode(responderList))), options);
+            });
         }
 
         JsonObject response = new JsonObject()
@@ -172,7 +176,6 @@ public class HttpApplication extends AbstractVerticle {
 
 
     private void generateIncidents(RoutingContext rc) {
-
         victims.clear();
 
         int numVictims = toInteger(rc.request().getParam("incidents")).orElse(10);
@@ -180,9 +183,10 @@ public class HttpApplication extends AbstractVerticle {
 
         victimCount = 0;
 
-
-        Observable<Victim> ob = Observable.from(disaster.generateVictims(numVictims));
-        ob.subscribe(
+        Future<String> polygonUpdate = updateBoundingPolygons();
+        polygonUpdate.setHandler(result -> {
+            Observable<Victim> ob = Observable.from(disaster.generateVictims(numVictims));
+            ob.subscribe(
                 item -> {
                     victimCount++;
                     if(!isDryRun)
@@ -191,13 +195,12 @@ public class HttpApplication extends AbstractVerticle {
                 },
                 error -> log.error("Exception while generating incidents", error),
                 () -> log.info("Incidents generated"));
-
-
+        });
 
         JsonObject response = new JsonObject()
-                .put("response", "If enabled, requests are sent to incident service, check logs for more details on the requests or endpoint [/g/incidents/lastrun]")
-                .put("isDryRun", isDryRun);
-
+                    .put("response", "If enabled, requests are sent to incident service, check logs for more details on the requests or endpoint [/g/incidents/lastrun]")
+                    .put("isDryRun", isDryRun);
+    
         rc.response()
                 .putHeader(CONTENT_TYPE, "application/json; charset=utf-8")
                 .end(response.encodePrettily());
@@ -231,4 +234,36 @@ public class HttpApplication extends AbstractVerticle {
         }
     }
 
+    /**
+     * Fetch the current inclusion zones from the disaster service, and update the Disaster's BoundingPolygons object.
+     * 
+     * @return a future indicating the result
+     */
+    private Future<String> updateBoundingPolygons() {
+        disaster.boundingPolygons.clearCurrentPolygons();
+        Future<String> future = Future.future();
+
+        //TODO: Also retrieve exclusion zones
+        WebClient webClient = WebClient.create(vertx);
+        webClient.get(
+            config().getInteger("disaster.service.port"), 
+            config().getString("disaster.service.host"), 
+            config().getString("disaster.service.path.inclusion.zones")
+        ).send(response -> {
+            log.info("Received response from disaster service: {}", response.result().bodyAsJsonArray().encodePrettily());
+            ServicePolygon polygons[] = Json.decodeValue(response.result().bodyAsString(), ServicePolygon[].class);
+            for (ServicePolygon polygon : polygons) {
+                Waypoint waypoints[] = new Waypoint[polygon.getPoints().size()];
+                polygon.getPoints().stream()
+                    .map(point -> new Waypoint(point[1], point[0]))
+                    .collect(Collectors.toList())
+                    .toArray(waypoints);
+                log.info("Adding inclusion polygon to disaster: {}", waypoints.toString());
+                disaster.boundingPolygons.setInclusionPolygon(waypoints);
+            }
+            future.complete();
+        });
+
+        return future;
+    }
 }

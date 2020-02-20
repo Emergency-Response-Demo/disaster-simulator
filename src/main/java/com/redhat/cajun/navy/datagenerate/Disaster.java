@@ -1,20 +1,22 @@
 package com.redhat.cajun.navy.datagenerate;
 
-import java.awt.geom.Point2D.Double;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
+
 public class Disaster {
+    private static final Logger log = LoggerFactory.getLogger(Disaster.class);
 
     private static GenerateFullNames fullNames = null;
-    private static GenerateRandomPoints points = null;
+    public BoundingPolygons boundingPolygons = new BoundingPolygons();
 
 
     public Disaster(String fNameFile, String lNameFile){
         fullNames = new GenerateFullNames(fNameFile,lNameFile);
-        points = new GenerateRandomPoints();
     }
 
 
@@ -22,7 +24,7 @@ public class Disaster {
         Victim v = new Victim();
         v.setVictimName(fullNames.getNextFullName());
 
-        Double point = points.getInternalPoint();
+        Waypoint point = boundingPolygons.getInternalWaypoint();
         v.setLatLon(point.getY(),point.getX());
 
         v.setVictimPhoneNumber(GeneratePhoneNumbers.getNextPhoneNumber());
@@ -42,7 +44,7 @@ public class Disaster {
 
     public Responder generateResponder() {
         Responder responder = new Responder();
-        Double point = points.getInternalPoint();
+        Waypoint point = boundingPolygons.getInternalWaypoint();
         responder.setName(fullNames.getNextFullName());
         responder.setPhoneNumber(GeneratePhoneNumbers.getNextPhoneNumber());
         responder.setBoatCapacity(biasedRandom(1, 12, 0.5));
@@ -68,4 +70,4 @@ public class Disaster {
         double biased = Math.pow(d, bias);
         return (int) Math.round(min + (max-min)*biased);
     }
-}
+ }

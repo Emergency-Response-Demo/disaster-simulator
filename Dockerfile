@@ -1,9 +1,7 @@
-FROM registry.access.redhat.com/rhscl/postgresql-96-rhel7:1-32
+FROM quay.io/btison/openjdk18-openshift:1.6
 
-USER root
-COPY opt/ /opt
-RUN chown -R 10001 /opt/*
-RUN chmod +x /opt/simulate-disaster.sh
+ENV JAVA_APP_DIR=/deployments
 
-USER 10001
-CMD /opt/simulate-disaster.sh
+EXPOSE 8080 8443
+
+COPY target/disaster-simulator-1.0.0.jar /deployments/
