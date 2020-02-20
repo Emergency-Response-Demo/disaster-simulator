@@ -234,11 +234,22 @@ public class HttpApplication extends AbstractVerticle {
         }
     }
 
+    /**
+     * Fetch the current inclusion zones from the disaster service, and update the Disaster's BoundingPolygons object.
+     * 
+     * @return a future indicating the result
+     */
     private Future<String> updateBoundingPolygons() {
         disaster.boundingPolygons.clearCurrentPolygons();
         Future<String> future = Future.future();
+
+        //TODO: Also retrieve exclusion zones
         WebClient webClient = WebClient.create(vertx);
-        webClient.get(80, "disaster-service.apps.cluster-erdemo-a3c5.erdemo-a3c5.example.opentlc.com", "/inclusion-zones").send(response -> {
+        webClient.get(
+            config().getInteger("disaster.service.port"), 
+            config().getString("disaster.service.hostname"), 
+            config().getString("disaster.service.inclusion.zones.path")
+        ).send(response -> {
             log.info("Received response from disaster service: {}", response.result().bodyAsJsonArray().encodePrettily());
             ServicePolygon polygons[] = Json.decodeValue(response.result().bodyAsString(), ServicePolygon[].class);
             for (ServicePolygon polygon : polygons) {
