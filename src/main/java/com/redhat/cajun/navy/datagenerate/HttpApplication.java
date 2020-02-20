@@ -247,7 +247,7 @@ public class HttpApplication extends AbstractVerticle {
         WebClient webClient = WebClient.create(vertx);
         webClient.get(
             config().getInteger("disaster.service.port"), 
-            config().getString("disaster.service.hostname"), 
+            config().getString("disaster.service.host"), 
             config().getString("disaster.service.path.inclusion.zones")
         ).send(response -> {
             log.info("Received response from disaster service: {}", response.result().bodyAsJsonArray().encodePrettily());
