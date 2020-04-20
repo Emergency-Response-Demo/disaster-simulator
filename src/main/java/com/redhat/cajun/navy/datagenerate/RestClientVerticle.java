@@ -33,11 +33,17 @@ public class RestClientVerticle extends AbstractVerticle {
 
     private String responderServiceClearPath;
 
+    private String missionServiceResetPath;
+
     private String missionServiceHost;
 
     private int missionServicePort;
 
-    private String missionServiceResetPath;
+    private String processServiceResetPath;
+
+    private String processServiceHost;
+
+    private int processServicePort;
 
     private String incidentPriorityServiceHost;
 
@@ -66,6 +72,9 @@ public class RestClientVerticle extends AbstractVerticle {
         incidentPriorityServiceHost = config().getString("incidentpriority.service.host");
         incidentPriorityServicePort = config().getInteger("incidentpriority.service.port");
         incidentPriorityServiceResetPath = config().getString("incidentpriority.service.path.reset");
+        processServiceHost = config().getString("process.service.host");
+        processServicePort = config().getInteger("process.service.port");
+        processServiceResetPath = config().getString("process.service.path.reset");
 
 
         startFuture.complete();
@@ -103,6 +112,10 @@ public class RestClientVerticle extends AbstractVerticle {
 
             case "reset-missions":
                 resetMissions();
+                break;
+
+            case "abort-process-instances":
+                abortProcessInstances();
                 break;
 
             case "reset-incident-priority":
@@ -184,6 +197,18 @@ public class RestClientVerticle extends AbstractVerticle {
                         log.info("Reset missions: HTTP response status " + response.statusCode());
                     } else {
                         log.error("Reset missions failed.", ar.cause());
+                    }
+                });
+    }
+
+    private void abortProcessInstances() {
+        client.post(processServicePort, processServiceHost, processServiceResetPath)
+                .send(ar -> {
+                    if (ar.succeeded()) {
+                        HttpResponse<Buffer> response = ar.result();
+                        log.info("Reset pInstances: HTTP response status " + response.statusCode());
+                    } else {
+                        log.error("Reset pInstances failed.", ar.cause());
                     }
                 });
     }

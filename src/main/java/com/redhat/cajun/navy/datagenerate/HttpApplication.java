@@ -90,6 +90,9 @@ public class HttpApplication extends AbstractVerticle {
             if (clearMissions) {
                 DeliveryOptions options = new DeliveryOptions().addHeader("action", "reset-missions");
                 vertx.eventBus().send("rest-client-queue", new JsonObject(), options);
+
+                options = new DeliveryOptions().addHeader("action", "abort-process-instances");
+                vertx.eventBus().send("rest-client-queue", new JsonObject(), options);
             }
         }
         JsonObject response = new JsonObject()
