@@ -51,6 +51,12 @@ public class RestClientVerticle extends AbstractVerticle {
 
     private String incidentPriorityServiceResetPath;
 
+    private String responderSimulatorHost;
+
+    private int responderSimulatorPort;
+
+    private String responderSimulatorResetPath;
+
     private String responderServiceCreatePath = null;
 
     @Override
@@ -75,8 +81,9 @@ public class RestClientVerticle extends AbstractVerticle {
         processServiceHost = config().getString("process.service.host");
         processServicePort = config().getInteger("process.service.port");
         processServiceResetPath = config().getString("process.service.path.reset");
-
-
+        responderSimulatorHost = config().getString("responder.simulator.host");
+        responderSimulatorPort = config().getInteger("responder.simulator.port");
+        responderSimulatorResetPath = config().getString("responder.simulator.path.reset");
         startFuture.complete();
     }
 
@@ -112,6 +119,10 @@ public class RestClientVerticle extends AbstractVerticle {
 
             case "reset-missions":
                 resetMissions();
+                break;
+
+            case "reset-responder-simulator":
+                resetResponderSimulator();
                 break;
 
             case "abort-process-instances":
@@ -156,9 +167,9 @@ public class RestClientVerticle extends AbstractVerticle {
                 .sendJsonObject(message.body(), ar -> {
                     if (ar.succeeded()) {
                         HttpResponse<Buffer> response = ar.result();
-                        log.info("Create incident for" + message.body().getString("victimName") + ": HTTP response status " + response.statusCode());
+                        log.info("Create incident for " + message.body().getString("victimName") + ": HTTP response status " + response.statusCode());
                     }
-                    else log.error("Create incident for" + message.body().getString("victimName") + " failed.", ar.cause());
+                    else log.error("Create incident for " + message.body().getString("victimName") + " failed.", ar.cause());
 
                 });
     }
@@ -209,6 +220,18 @@ public class RestClientVerticle extends AbstractVerticle {
                         log.info("Reset pInstances: HTTP response status " + response.statusCode());
                     } else {
                         log.error("Reset pInstances failed.", ar.cause());
+                    }
+                });
+    }
+
+    private void resetResponderSimulator() {
+        client.post(responderSimulatorPort, responderSimulatorHost, responderSimulatorResetPath)
+                .send(ar -> {
+                    if (ar.succeeded()) {
+                        HttpResponse<Buffer> response = ar.result();
+                        log.info("Reset responder simulator: HTTP response status " + response.statusCode());
+                    } else {
+                        log.error("Reset responder simulator failed.", ar.cause());
                     }
                 });
     }

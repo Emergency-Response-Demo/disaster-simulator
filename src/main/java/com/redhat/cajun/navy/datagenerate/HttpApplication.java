@@ -91,6 +91,9 @@ public class HttpApplication extends AbstractVerticle {
                 DeliveryOptions options = new DeliveryOptions().addHeader("action", "reset-missions");
                 vertx.eventBus().send("rest-client-queue", new JsonObject(), options);
 
+                options = new DeliveryOptions().addHeader("action", "reset-responder-simulator");
+                vertx.eventBus().send("rest-client-queue", new JsonObject(), options);
+
                 options = new DeliveryOptions().addHeader("action", "abort-process-instances");
                 vertx.eventBus().send("rest-client-queue", new JsonObject(), options);
             }
