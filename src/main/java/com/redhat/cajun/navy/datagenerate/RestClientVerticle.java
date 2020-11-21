@@ -201,7 +201,7 @@ public class RestClientVerticle extends AbstractVerticle {
     }
 
     private void resetMissions() {
-        client.get(missionServicePort, missionServiceHost, missionServiceResetPath)
+        client.post(missionServicePort, missionServiceHost, missionServiceResetPath)
                 .send(ar -> {
                     if (ar.succeeded()) {
                         HttpResponse<Buffer> response = ar.result();
