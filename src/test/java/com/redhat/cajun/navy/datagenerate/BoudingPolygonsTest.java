@@ -286,7 +286,7 @@ public class BoudingPolygonsTest {
 				};
 		
 		BoundingPolygons boundingPolygons = new BoundingPolygons();
-		
+		boundingPolygons.clearCurrentPolygons();
 		boundingPolygons.setInclusionPolygon(BoundingPolygons.setWaypoints(waypointsSquare1, true));
 		
 		printPolygonOutput("Test Three Points In a Line Genereate Points", boundingPolygons);
@@ -545,12 +545,12 @@ public class BoudingPolygonsTest {
 		System.err.println();
     }
 	
-	@Test(expected = RuntimeException.class)
-    public void testNoInitPolygon()
+	@Test
+    public void testDefaultPolygon()
     {
 		BoundingPolygons boundingPolygons = new BoundingPolygons();
 		
-		printPolygonOutput("Test No Init Polygon", boundingPolygons);
+		printPolygonOutput("Test Default Polygon", boundingPolygons);
 		
 		printWaypoint(boundingPolygons.getInternalWaypoint());
 		

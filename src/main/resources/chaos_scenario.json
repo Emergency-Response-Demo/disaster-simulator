@@ -1,0 +1,12 @@
+{
+    "avgPeoplePerHousehold": 4.5,
+    "medicalNeedRate": 0.6,
+    "responderDensity": 0.02,
+    "regionalRiskFactor": 2.0,
+    "improbabilityFactor": {
+        "externalExploitation": 0.8,
+        "internalUnrest": 0.9,
+        "increasedCrime": 0.7,
+        "decreasedResponseRatio": 0.5
+    }
+}

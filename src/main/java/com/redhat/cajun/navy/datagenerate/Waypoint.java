@@ -50,7 +50,7 @@ public class Waypoint implements com.redhat.cajun.navy.datagenerateinterface.Way
 	public void setLongitude(double longitude) {
 		if(longitude < -180 || longitude >  180)
 	       {
-	    	   throw new RuntimeException("Latitude values must be between -180 and 180 inclusive");
+		   throw new RuntimeException("Longitude values must be between -180 and 180 inclusive");
 	       }
 	       
 	       this.longitude = longitude;
@@ -76,11 +76,4 @@ public class Waypoint implements com.redhat.cajun.navy.datagenerateinterface.Way
 		return bd.doubleValue();
 	}
 	
-	public static void main(String args[])
-	{
-		System.err.println(new Waypoint(10, 10));
-		System.err.println(new Waypoint(30, 40));
-		System.err.println(new Waypoint(-90, -280));
-		
-	}
 }

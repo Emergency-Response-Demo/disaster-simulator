@@ -1,0 +1,43 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "pop_density": 2.0,
+        "name": "Downtown"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-77.95, 34.22],
+            [-77.93, 34.22],
+            [-77.93, 34.24],
+            [-77.95, 34.24],
+            [-77.95, 34.22]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "pop_density": 0.5,
+        "name": "Suburbs"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-77.98, 34.20],
+            [-77.95, 34.20],
+            [-77.95, 34.22],
+            [-77.98, 34.22],
+            [-77.98, 34.20]
+          ]
+        ]
+      }
+    }
+  ]
+}

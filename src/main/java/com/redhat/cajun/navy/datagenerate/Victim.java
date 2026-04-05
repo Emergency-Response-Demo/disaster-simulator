@@ -10,6 +10,12 @@ public class Victim {
     private boolean isMedicalNeeded = false;
     private String victimName = null;
     private String victimPhoneNumber = null;
+    private int age = 0;
+    private String gender = "U";
+    private boolean pregnant = false;
+    private boolean conscious = true;
+    private String mobility = "AMBULATORY";
+    private int priority = 0;
 
 
 
@@ -67,6 +73,53 @@ public class Victim {
         this.victimPhoneNumber = victimPhoneNumber;
     }
 
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public boolean isPregnant() {
+        return pregnant;
+    }
+
+    public void setPregnant(boolean pregnant) {
+        this.pregnant = pregnant;
+    }
+
+    public boolean isConscious() {
+        return conscious;
+    }
+
+    public void setConscious(boolean conscious) {
+        this.conscious = conscious;
+    }
+
+    public String getMobility() {
+        return mobility;
+    }
+
+    public void setMobility(String mobility) {
+        this.mobility = mobility;
+    }
+
+    public int getPriority() {
+        return priority;
+    }
+
+    public void setPriority(int priority) {
+        this.priority = priority;
+    }
 
     @Override
     public String toString() {

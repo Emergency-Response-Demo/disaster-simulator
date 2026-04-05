@@ -1,7 +1,5 @@
 package com.redhat.cajun.navy.datagenerate;
 
-import java.math.BigDecimal;
-
 public class Responder {
 
     private String id;
@@ -23,6 +21,9 @@ public class Responder {
     private Boolean available = true;
 
     private Boolean person = false;
+
+    private String type = "BOAT";
+    private Double speed = 10.0;
 
     public String getName() {
         return name;
@@ -102,5 +103,21 @@ public class Responder {
 
     public void setEnrolled(Boolean enrolled) {
         this.enrolled = enrolled;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public Double getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(Double speed) {
+        this.speed = speed;
     }
 }
