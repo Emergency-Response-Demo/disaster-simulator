@@ -17,6 +17,7 @@ public class BoundingPolygons {
 
 	private Double exclusionPolygons = null;
 	private List<Zone> inclusionZones = new ArrayList<>();
+	private double totalInclusionWeight = 0.0;
 
 	public BoundingPolygons() {
 		// Default inclusion polygon (Wilmington, NC area approx)
@@ -30,9 +31,10 @@ public class BoundingPolygons {
 		setInclusionPolygon(defaultPoints);
 	}
 
-    public void setInclusionZones(List<Zone> zones) {
-        this.inclusionZones = zones;
-    }
+	public void setInclusionZones(List<Zone> zones) {
+		this.inclusionZones = zones;
+		updateTotalWeight();
+	}
 
     public List<Zone> getInclusionZones() {
         return inclusionZones;
@@ -57,7 +59,9 @@ public class BoundingPolygons {
 			}
 		}
 		path.closePath();
-        inclusionZones.add(new Zone(path, 1.0));
+		Zone zone = new Zone(path, 1.0);
+		inclusionZones.add(zone);
+		totalInclusionWeight += zone.getWeight();
 	}
 	
 	public void setExclusionPolygon(Waypoint waypoints[])
@@ -115,16 +119,16 @@ public class BoundingPolygons {
 	
 	public Waypoint getInternalWaypoint()
 	{
-        if (inclusionZones.isEmpty()) {
-            throw new RuntimeException("No inclusion zones defined");
-        }
+		if (inclusionZones.isEmpty()) {
+			throw new RuntimeException("No inclusion zones defined");
+		}
 
 		boolean running = true;
 		int c = 0;
 		while(running)
 		{
-            // Pick a zone based on weight
-            Zone zone = selectWeightedZone();
+			// Pick a zone based on weight
+			Zone zone = selectWeightedZone();
 			Waypoint waypoint = getWaypoint(zone);
 
 			if((zone.contains(waypoint.getX(), waypoint.getY()) && exclusionPolygons == null) ||
@@ -142,18 +146,15 @@ public class BoundingPolygons {
 		return getAveragedWaypoint();
 	}
 
-    private Zone selectWeightedZone() {
-        double totalWeight = 0.0;
-        for (Zone z : inclusionZones) totalWeight += z.getWeight();
-
-        double r = ThreadLocalRandom.current().nextDouble() * totalWeight;
-        double count = 0.0;
-        for (Zone z : inclusionZones) {
-            count += z.getWeight();
-            if (count >= r) return z;
-        }
-        return inclusionZones.get(0);
-    }
+	private Zone selectWeightedZone() {
+		double r = ThreadLocalRandom.current().nextDouble() * totalInclusionWeight;
+		double count = 0.0;
+		for (Zone z : inclusionZones) {
+			count += z.getWeight();
+			if (count >= r) return z;
+		}
+		return inclusionZones.get(0);
+	}
 	
 	/**
 	 * 
@@ -177,6 +178,14 @@ public class BoundingPolygons {
 	{
 		exclusionPolygons = null;
 		inclusionZones.clear();
+		totalInclusionWeight = 0.0;
+	}
+
+	private void updateTotalWeight() {
+		totalInclusionWeight = 0.0;
+		for (Zone z : inclusionZones) {
+			totalInclusionWeight += z.getWeight();
+		}
 	}
 	
 	/**
