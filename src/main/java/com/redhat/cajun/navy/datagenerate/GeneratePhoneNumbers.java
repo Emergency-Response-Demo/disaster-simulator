@@ -17,7 +17,7 @@ public class GeneratePhoneNumbers {
     private final static String format = "(%s) %s-%s";
 
     public static String getNextPhoneNumber() {
-        int areaCode = 0;
+        int areaCode;
         int percentage = random.nextInt(100);
 
         //Use the NC area codes for 90% of the time
